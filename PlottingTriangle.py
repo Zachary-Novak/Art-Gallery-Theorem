@@ -1,3 +1,4 @@
+from asyncio import events
 from tkinter import *
 import math
 
@@ -52,6 +53,24 @@ def colorInPolygon():
         i = i + 2
     pass
 
+def findEdge(point1, point2):
+    return math.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[0])**2)
+
+def findMidPoint(point1, point2):
+    list = []
+    list.append((point1[0] + point2[0]) / 2)
+    list.append((point1[1] + point2[1]) / 2)
+    return list 
+
+def createCircle(point1, point2, point3):
+   e1 = findEdge(point1, point2)
+   e2 = findEdge(point2, point3)
+   e3 = findEdge(point1, point3)
+   
+   
+   
+    
+
 def draw_dots(event):
     global finishedHull
     if not finishedHull:
@@ -74,8 +93,14 @@ def draw_dots(event):
                 anything = myCanvas.create_line(pointList[0], pointList[1], pointList[2], pointList[3], fill="red")
                 pointList.pop(0)
                 pointList.pop(0)
+        finishedHull = False
 
-        
-myCanvas.pack()
+   
 myTk.bind("<Button-1>", draw_dots)
+
+quit_button = Button(myTk, text="Exit")
+quit_button.pack(side="bottom")
+quit_button["command"] = myTk.destroy
+myCanvas.pack()
+
 myTk.mainloop()
