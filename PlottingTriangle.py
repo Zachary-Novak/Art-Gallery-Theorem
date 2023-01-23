@@ -33,7 +33,7 @@ def findCircle(point1, point2, point3):
     
     a2 = secondLinePoint
     b2 = 1
-    c2 = secondLinePoint*secondLinePoint[0]+secondLinePoint[1]
+    c2 = secondLineSlope*secondLinePoint[0]+secondLinePoint[1]
     
     circleCenter = [
         (b1*c2-b2*c1)/(a1*b2-a2*b1),
