@@ -7,6 +7,7 @@ myTk.title("Triangle Testing")
 myCanvas = Canvas(myTk, bd=4, bg="skyblue", cursor="circle", height=600, width=600)
 pointList = []
 hull = []
+destroyList = []
 finishedHull = False
 
 def pythagMyBro(point1, point2):
@@ -22,27 +23,53 @@ def insideCircle(circle, point):
 
 def findIntersection(point1, point2, point3, point4):
         
-    firstLineSlope = ((point2[1] - point1[1])/(point2[0] - point1[0]))*-1
+    try:
+        firstLineSlope = (point2[1] - point1[1])/(point2[0]-point1[0])*-1
+    except ZeroDivisionError:
+        firstLineSlope = float('inf')
     firstLinePoint = point1
 
-    secondLineSlope = ((point4[1] - point3[1])/(point4[0] - point3[0]))*-1
+    try:
+        secondLineSlope = ((point4[1] - point3[1])/(point4[0] - point3[0]))*-1
+    except ZeroDivisionError:
+        secondLineSlope = float('inf')
     secondLinePoint = point3
+    
     
     a1 = firstLineSlope
     b1 = 1
     c1 = firstLineSlope*firstLinePoint[0]+firstLinePoint[1]
-    print("First Slope is: " + str(a1))
+    #print("First Slope is: " + str(a1))
     
     a2 = secondLineSlope
     b2 = 1
     c2 = secondLineSlope*secondLinePoint[0]+secondLinePoint[1]
-    print("Second Slope is: " + str(a2))
-    print(str(a1*b2-a2*b1))
+    #print("Second Slope is: " + str(a2))
+    #print(str(a1*b2-a2*b1))
+    
+    if a1 == a2:
+        return [float('inf'), float('inf')]
+    
+    
+    '''if firstLineSlope == float('inf') and ((point3[0] >= firstLinePoint[0] and point4[0] <= firstLinePoint[0]) or (point3[0] <= firstLinePoint[0] and point4[0] >= firstLinePoint[0])):
+        intersection = [
+            firstLinePoint[0],
+            secondLineSlope*firstLinePoint[0]-c2]
+        print("First Inf")
+    elif secondLineSlope == float('inf') and ((point1[0] >= secondLinePoint[0] and point2[0] <= secondLinePoint[0]) or (point1[0] <= secondLinePoint[0] and point2[0] >= secondLinePoint[0])):
+        intersection = [
+            secondLinePoint[0],
+            firstLineSlope*secondLinePoint[0]-c1]
+        print("Second Inf")
+    else:'''
+    
+    
     
     intersection = [
         -1*(b1*c2-b2*c1)/(a1*b2-a2*b1),
         -1*(a2*c1-a1*c2)/(a1*b2-a2*b1),
     ]
+    print(intersection)
     return intersection
 
 def findCircle(point1, point2, point3):
@@ -77,24 +104,27 @@ def checkForCross():
         point3 = [hull[counter-1], hull[counter]]
         point2 = [hull[newPoint-3], hull[newPoint-2]]
         point1 = [hull[newPoint-1], hull[newPoint]]
-        print("\n")
+        '''print("\n")
         print(point1)
         print(point2)
         print(point3)
         print(point4)
-        print("\n")
-        firstLineSlope = (point2[1] - point1[1])/(point2[0]-point1[0])
+        print("\n")'''
+        
         #print("firstLineSLope: " + str(firstLineSlope))
         
-        secondLineSlope = (point4[1] - point3[1])/(point4[0]-point3[0])
-       # print("secondLineSlope: " + str(secondLineSlope))
+        try:
+            secondLineSlope = (point4[1] - point3[1])/(point4[0]-point3[0])
+        except ZeroDivisionError:
+            secondLineSlope = float('inf')
+        #print("secondLineSlope: " + str(secondLineSlope))
         intersection = findIntersection(point1, point2, point3, point4)
-        print("\nIntersection Testing!   Points: " + str((counter/2)+0.5) + " " + str((counter/2)-0.5))
-        print(str(point1[0]) + " " + str(point2[0]) + " " + str(intersection[0]) + " " + str(min([point1[0], point2[0], intersection[0]])))
-        print(str(point1[1]) + " " + str(point2[1]) + " " + str(intersection[1]) + " " + str(min([point1[1], point2[1], intersection[1]])))
-        print(str(point3[0]) + " " + str(point4[0]) + " " + str(intersection[0]) + " " + str(min([point3[0], point4[0], intersection[0]])))
-        print(str(point3[1]) + " " + str(point4[1]) + " " + str(intersection[1]) + " " + str(min([point3[1], point4[1], intersection[1]])))
-        print("\n")
+        #print("\nIntersection Testing!   Points: " + str((counter/2)+0.5) + " " + str((counter/2)-0.5))
+        #print(str(point1[0]) + " " + str(point2[0]) + " " + str(intersection[0]) + " " + str(min([point1[0], point2[0], intersection[0]])))
+        #print(str(point1[1]) + " " + str(point2[1]) + " " + str(intersection[1]) + " " + str(min([point1[1], point2[1], intersection[1]])))
+        #print(str(point3[0]) + " " + str(point4[0]) + " " + str(intersection[0]) + " " + str(min([point3[0], point4[0], intersection[0]])))
+        #print(str(point3[1]) + " " + str(point4[1]) + " " + str(intersection[1]) + " " + str(min([point3[1], point4[1], intersection[1]])))
+        #print("\n")
         if min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0] and min([point1[1], point2[1], intersection[1]]) != intersection[1] and max([point1[1], point2[1], intersection[1]]) != intersection[1] and min([point3[0], point4[0], intersection[0]]) != intersection[0] and max([point3[0], point4[0], intersection[0]]) != intersection[0] and min([point3[1], point4[1], intersection[1]]) != intersection[1] and max([point3[1], point4[1], intersection[1]]) != intersection[1]:
             return True
         
@@ -118,23 +148,38 @@ def draw_dots(event):
         hull.append(x_coord)
         hull.append(y_coord)
         #print(len(pointList))
+        if len(destroyList) > 0:
+            counter = len(destroyList)-1
+            while counter >= 0:
+                myCanvas.delete(destroyList[counter])
+                counter -= 1
+            destroyList.clear()
         if len(hull) > 4 and (math.sqrt(pow((y_coord-hull[1]), 2) + pow((x_coord-hull[0]), 2))) < 5:
             #print(len(pointList))
-            anything = myCanvas.create_line(pointList[0], pointList[1], hull[0], hull[1], fill="red")
+            anything = myCanvas.create_line(pointList[0], pointList[1], hull[0], hull[1], fill="blue")
             anything2 = myCanvas.create_polygon
             finishedHull = True
         else:
             if len(pointList) == 2:
                 dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="green",width=0)
-            elif len(pointList) == 4 and len(hull) < 11:
+            elif len(pointList) == 4 and not checkForCross():
                 counter = len(hull)-1
-                if counter > 5:
-                    print("CheckForCross: " + str(checkForCross()))
+                #if counter > 5:
+                    #print("CheckForCross: " + str(checkForCross()))
                 dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="green",width=0)
                 #print("We Did IT!")
-                anything = myCanvas.create_line(pointList[0], pointList[1], pointList[2], pointList[3], fill="red")
+                anything = myCanvas.create_line(pointList[0], pointList[1], pointList[2], pointList[3], fill="blue")
                 pointList.pop(0)
                 pointList.pop(0)
+            else:
+                circleBreak = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="red",width=0, tags="DestroyCircle")
+                lineBreak = myCanvas.create_line(pointList[0], pointList[1], pointList[2], pointList[3], fill="black", tags="DestroyLine")
+                destroyList.append(circleBreak)
+                destroyList.append(lineBreak)
+                hull.pop()
+                hull.pop()
+                pointList.pop()
+                pointList.pop()
 
         
 myCanvas.pack()
