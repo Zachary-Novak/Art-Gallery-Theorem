@@ -20,8 +20,8 @@ display_label.place(x=0, y=580)
 
 
 totalscore = 0
-total_display = tk.Label(window, text="Total:" + str(totalscore))
-total_display.pack(side="left")      
+total_display = tk.Label(window, text="Total: " + str(totalscore))
+total_display.place(x=200,y=590,anchor="center")
 
 def draw_dots(event):
     
@@ -39,7 +39,7 @@ def draw_dots(event):
         score_display = tk.Label(window, text=str(score))
         score_display.pack(side="left")
         totalscore+=score
-        total_display["text"]="Total:" + str(totalscore)
+        total_display["text"]="Total: " + str(totalscore)
         total_display.place(x=200,y=590,anchor="center")
         #total_display.pack(side="bottom")
 
@@ -48,7 +48,7 @@ def draw_dots(event):
         score_display = tk.Label(window, text=str(score))
         score_display.pack(side="left")
         totalscore+=score
-        total_display["text"]="Total:" + str(totalscore)
+        total_display["text"]="Total: " + str(totalscore)
         total_display.place(x=200,y=590,anchor="center")
 
 
@@ -58,7 +58,7 @@ def draw_dots(event):
         score_display = tk.Label(window, text=str(score))
         score_display.pack(side="left")
         totalscore+=score
-        total_display["text"]="Total:" + str(totalscore)
+        total_display["text"]="Total: " + str(totalscore)
         #total_display.pack(side="bottom")
         total_display.place(x=200,y=590,anchor="center")
 
@@ -67,7 +67,7 @@ def draw_dots(event):
         score_display = tk.Label(window, text=str(score))
         score_display.pack(side="left")
         totalscore+=score
-        total_display["text"]="Total:" + str(totalscore)
+        total_display["text"]="Total: " + str(totalscore)
         #total_display.pack(side="bottom")
         total_display.place(x=200,y=590,anchor="center")
 
@@ -76,7 +76,7 @@ def draw_dots(event):
         score_display = tk.Label(window, text=str(score))
         score_display.pack(side="left")
         totalscore+=score
-        total_display["text"]="Total:" + str(totalscore)
+        total_display["text"]="Total: " + str(totalscore)
         #total_display.pack(side="bottom")
         total_display.place(x=200,y=590,anchor="center")
 
@@ -87,7 +87,7 @@ def draw_dots(event):
         score_display = tk.Label(window, text=str(score))
         score_display.pack(side="left")
         totalscore+=score
-        total_display["text"]="Total:" + str(totalscore)
+        total_display["text"]="Total: " + str(totalscore)
         #total_display.pack(side="bottom")
         total_display.place(x=200,y=590,anchor="center")
 
