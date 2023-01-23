@@ -9,10 +9,40 @@ pointList = []
 hull = []
 finishedHull = False
 
-def insideCircle(point1, point2, point3, point4 = None):
-    if point4 == None:
-        center = [point1[0] - point2[0], point1[1] - point1[2]]
-    pass
+def pythagMyBro(point1, point2):
+    return math.sqrt(pow(point2[1] - point1[1], 2) + pow(point2[0] - point1[0]))
+
+def insideCircle(circle, point):
+    center = circle[0]
+    distance = circle[1]
+    if pythagMyBro(center, point) < distance:
+        return True
+    else:
+        return False
+
+def findCircle(point1, point2, point3):
+    firstLineSlope = (point2[1] - point1[1])/(point2[0]-point2[0])*(-0.5)
+    firstLinePoint = [(point2[0] + point1[0])/2, (point2[1]+point1[1])/2]
+    
+    secondLineSlope = (point3[1] - point1[1])/(point3[0]-point3[0])*(-0.5)
+    secondLinePoint = [(point3[0] + point1[0])/2, (point3[1]+point1[1])/2]
+
+    a1 = firstLineSlope
+    b1 = 1
+    c1 = firstLineSlope*firstLinePoint[0]+firstLinePoint[1]
+    
+    a2 = secondLinePoint
+    b2 = 1
+    c2 = secondLinePoint*secondLinePoint[0]+secondLinePoint[1]
+    
+    circleCenter = [
+        (b1*c2-b2*c1)/(a1*b2-a2*b1),
+        (a2*c1-a1*c2)/(a1*b2*a2*b1),
+    ]
+    radius = abs(pythagMyBro(circleCenter, firstLinePoint))
+    
+    return [circleCenter, radius]
+    
 
 
 def colorInPolygon():
