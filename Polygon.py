@@ -57,7 +57,7 @@ class Polygon:
         self.myTk = Tk()
         self.myTk.title("Triangle Testing")
 
-        self.myCanvas = Canvas(self.myTk, bd=4, bg="skyblue", cursor="circle", height=600, width=600)
+        self.myCanvas = Canvas(self.myTk, bd=4, bg="skyblue", cursor="circle", height=800, width=1200)
         self.pointList = []
         self.hull = []
         self.destroyList = []
@@ -237,10 +237,53 @@ class Polygon:
             counter -= 2
         return False
     
+    
+    
+    def findAngle(self, point1, point2, point3):
+        return math.degrees(math.atan2(point3[1] - point2[1], point3[0] - point2[0]) - math.atan2(point1[1]-point2[1],point1[0] - point2[0]))
+    
+    def findSlopeFromThreePoints(self, point1, point2, point3):
+        slope1 = (point2[1]-point1[1])/(point2[0]-point1[0])
+        slope2 = (point3[1]-point2[1])/(point3[0]-point2[0])
+        return (slope1+slope2)/2
+    
     def isAngleInsidePolygon(self):
-        
-        
-        pass
+        i = 0
+        iterator = []
+        while i < len(self.hull):
+            isEar = False
+            iterator.clear()
+            counter = i
+            while counter < len(self.hull):
+                iterator.append(counter)
+                counter += 1
+            counter = 0
+            while counter < i:
+                iterator.append(counter)
+                counter += 1
+            
+            castingSlope = self.findSlopeFromThreePoints([self.hull[iterator[i]], self.hull[iterator[i+1]]], [self.hull[iterator[i+2]], self.hull[iterator[i+3]]], [self.hull[iterator[i+4]], self.hull[iterator[i+5]]])
+
+            x = math.sqrt(pow(2000, 2)/(castingSlope^2 + 1)) + self.hull[i]
+            y = x*castingSlope + self.hull[i+1]
+            
+            
+            endPoint = [x, y]
+            totalIntersections = 0
+            while j < len(iterator)-2:
+                intersection = self.findIntersection(self.hull[iterator[i]], endPoint, [self.hull[iterator[j]], self.hull[iterator[j+1]]], [self.hull[iterator[j+2], self.hull[iterator[j+3]]]])
+                if intersection == True:
+                    totalIntersections += 1
+                j += 2
+            if totalIntersections%2 == 0:
+                isEar = False
+            else:
+                isEar = True
+                
+            if isEar:
+                pass
+            
+            i += 2
             
     def createScreen(self):
         self.myCanvas.pack()
