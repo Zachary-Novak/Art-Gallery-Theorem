@@ -247,7 +247,7 @@ class Polygon:
         slope2 = (point3[1]-point2[1])/(point3[0]-point2[0])
         return (slope1+slope2)/2
     
-    def isAngleInsidePolygon(self):
+    def triangulate(self):
         i = 0
         iterator = []
         while i < len(self.hull):
@@ -271,7 +271,7 @@ class Polygon:
             endPoint = [x, y]
             totalIntersections = 0
             while j < len(iterator)-2:
-                intersection = self.findIntersection(self.hull[iterator[i]], endPoint, [self.hull[iterator[j]], self.hull[iterator[j+1]]], [self.hull[iterator[j+2], self.hull[iterator[j+3]]]])
+                intersection = self.findIntersection([self.hull[iterator[i]], self.hull[iterator[i+1]]], endPoint, [self.hull[iterator[j+2]], self.hull[iterator[j+3]]], [self.hull[iterator[j+4], self.hull[iterator[j+5]]]])
                 if intersection == True:
                     totalIntersections += 1
                 j += 2
@@ -281,6 +281,7 @@ class Polygon:
                 isEar = True
                 
             if isEar:
+                triangle = self.myCanvas.create_polygon(self.hull[iterator[i]], self.hull[iterator[i+1]], self.hull[iterator[j+2]], self.hull[iterator[j+3]], self.hull[iterator[j+4], self.hull[iterator[j+5]]], fill="lemonchiffon")
                 pass
             
             i += 2
