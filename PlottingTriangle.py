@@ -53,26 +53,57 @@ def findIntersection(point1, point2, point3, point4):
     if a1 == a2:
         return [float('inf'), float('inf')]
     
+    if firstLineSlope == float('inf'):
+        print("firstlineSlope")
+        print(point1)
+        print(point2)
+        print(point3)
+        print(point4)
+    if secondLineSlope == float('inf'):
+        print("secondLineSlope")
+        print(point1)
+        print(point2)
+        print(point3)
+        print(point4)
     
-    '''if firstLineSlope == float('inf') and ((point3[0] >= firstLinePoint[0] and point4[0] <= firstLinePoint[0]) or (point3[0] <= firstLinePoint[0] and point4[0] >= firstLinePoint[0])):
+    if firstLineSlope == float('inf'):
         intersection = [
             firstLinePoint[0],
-            secondLineSlope*firstLinePoint[0]-c2]
+            -1*secondLineSlope*firstLinePoint[0]+c2]
+        x_coord = intersection[0]
+        y_coord = intersection[1]
+        dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="black",width=0)
         print("First Inf")
-    elif secondLineSlope == float('inf') and ((point1[0] >= secondLinePoint[0] and point2[0] <= secondLinePoint[0]) or (point1[0] <= secondLinePoint[0] and point2[0] >= secondLinePoint[0])):
+        print(intersection)
+    elif secondLineSlope == float('inf'):
         intersection = [
             secondLinePoint[0],
-            firstLineSlope*secondLinePoint[0]-c1]
+            -1*firstLineSlope*secondLinePoint[0]+c1]
+        x_coord = intersection[0]
+        y_coord = intersection[1]
+        dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="black",width=0)
+        
         print("Second Inf")
-    else:'''
-    
-    
-    
-    intersection = [
-        -1*(b1*c2-b2*c1)/(a1*b2-a2*b1),
-        -1*(a2*c1-a1*c2)/(a1*b2-a2*b1),
-    ]
-    print(intersection)
+        print(intersection)
+    elif firstLineSlope != float('inf') and secondLineSlope != float('inf'):
+        intersection = [
+            -1*(b1*c2-b2*c1)/(a1*b2-a2*b1),
+            -1*(a2*c1-a1*c2)/(a1*b2-a2*b1),
+        ]
+        
+        
+    else:
+        print("Failure :(")
+        
+    #print(intersection)
+    '''if (intersection[0] + 0.000005 > round(intersection[0])):
+        intersection[0] = round(intersection[0])   
+    if (intersection[0] - 0.000005 < round(intersection[0])):
+        intersection[0] = round(intersection[0])
+    if (intersection[1] + 0.000005 > round(intersection[1])):
+        intersection[1] = round(intersection[1])
+    if (intersection[1] - 0.000005 < round(intersection[1])):
+        intersection[1] = round(intersection[1])'''
     return intersection
 
 def findCircle(point1, point2, point3):
@@ -101,7 +132,7 @@ def checkForCross():
     print(hull)
     print("\n")
     newPoint = counter
-    counter -= 2
+    counter -= 4
     while counter > 2:
         point4 = [hull[counter-3], hull[counter-2]]
         point3 = [hull[counter-1], hull[counter]]
@@ -128,8 +159,27 @@ def checkForCross():
         #print(str(point3[0]) + " " + str(point4[0]) + " " + str(intersection[0]) + " " + str(min([point3[0], point4[0], intersection[0]])))
         #print(str(point3[1]) + " " + str(point4[1]) + " " + str(intersection[1]) + " " + str(min([point3[1], point4[1], intersection[1]])))
         #print("\n")
-        if min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0] and min([point1[1], point2[1], intersection[1]]) != intersection[1] and max([point1[1], point2[1], intersection[1]]) != intersection[1] and min([point3[0], point4[0], intersection[0]]) != intersection[0] and max([point3[0], point4[0], intersection[0]]) != intersection[0] and min([point3[1], point4[1], intersection[1]]) != intersection[1] and max([point3[1], point4[1], intersection[1]]) != intersection[1]:
-            return True
+        if (intersection != [float('inf'), float('inf')]):
+            print("First Passed")
+            if (min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point2[0]):# and (intersection[1] != point1[1] and intersection[1] != point2[1])):
+                print("Second Passed")
+                if (min([point1[1], point2[1], intersection[1]]) != intersection[1] and max([point1[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == point1[1] and intersection[1] == point2[1]):# and (intersection[0] != point1[0] and intersection[0] != point2[0])):
+                    print("Third Passed")
+                    if (min([point3[0], point4[0], intersection[0]]) != intersection[0] and max([point3[0], point4[0], intersection[0]]) != intersection[0]) or (intersection[0] == point3[0] and intersection[0] == point4[0]):# and (intersection[1] != point3[1] and intersection[1] != point4[1])):
+                        print("Fourth Passed")
+                        if (min([point3[1], point4[1], intersection[1]]) != intersection[1] and max([point3[1], point4[1], intersection[1]]) != intersection[1])  or (intersection[1] == point3[1] and intersection[1] == point4[1]):# and (intersection[0] != point3[0] and intersection[0] != point4[0])):
+                            print("\nIntersection Testing!   Points: " + str((counter/2)+0.5) + " " + str((counter/2)-0.5))
+                            print(point1)
+                            print(point2)
+                            print(point3)
+                            print(point4)
+                            print(intersection)
+                            return True
+        '''if (intersection != [float('inf'), float('inf')] and 
+            ((intersection[1] == point1[1] or intersection[1] == point2[1]) and 
+                (min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0])) or
+            ((intersection[0] == point1[0] or intersection[0] == point2[0]))
+        )'''
         
         counter -= 2
     return False
@@ -222,10 +272,10 @@ myCanvas.pack()
 
 myTk.mainloop()
 
-'''point1 = [0, 300]
-point2 = [600, 320]
+'''point1 = [300, 300]
+point2 = [310, 400]
 
-point3 = [200, 200]
-point4 = [300, 400]
+point3 = [200, 350]
+point4 = [400, 350]
 
 print(findIntersection(point1, point2, point3, point4))'''
