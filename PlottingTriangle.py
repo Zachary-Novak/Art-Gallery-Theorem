@@ -118,10 +118,15 @@ def findMidPoint(point1, point2):
     list.append((point1[1] + point2[1]) / 2)
     return list 
 
+def findSlope(point1, point2):
+    return (point2[1] - point1[1]) / (point2[0] - point1[0])
+
 def createCircle(point1, point2, point3):
    e1 = findEdge(point1, point2)
    e2 = findEdge(point2, point3)
    e3 = findEdge(point1, point3)
+   firstLineSlope = findSlope(point1, point2)
+
    
    
    
