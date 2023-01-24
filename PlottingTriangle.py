@@ -185,7 +185,7 @@ def colorInPolygon():
         i = i + 2
     pass
 
-def findEdge(point1, point2):
+def findEdgeDistance(point1, point2):
     return math.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[0])**2)
 
 def findMidPoint(point1, point2):
@@ -197,11 +197,14 @@ def findMidPoint(point1, point2):
 def findSlope(point1, point2):
     return (point2[1] - point1[1]) / (point2[0] - point1[0])
 
-def createCircle(point1, point2, point3):
-   e1 = findEdge(point1, point2)
-   e2 = findEdge(point2, point3)
-   e3 = findEdge(point1, point3)
-   firstLineSlope = findSlope(point1, point2)
+"""def createCircle(point1, point2, point3):
+   e1 = findEdgeDistance(point1, point2)
+   e2 = findEdgeDistance(point2, point3)
+   e3 = findEdgeDistance(point1, point3)
+   intersecting_point = findIntersection(point1, point2, point1, point2)
+   mid_pt = findMidPoint(point1, point2)
+   radius = findEdgeDistance(mid_pt, intersecting_point)"""
+    
     
 
 def draw_dots(event):
