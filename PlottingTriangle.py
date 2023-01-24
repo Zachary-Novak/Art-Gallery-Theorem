@@ -53,7 +53,7 @@ def findIntersection(point1, point2, point3, point4):
     if a1 == a2:
         return [float('inf'), float('inf')]
     
-    if firstLineSlope == float('inf'):
+    '''if firstLineSlope == float('inf'):
         print("firstlineSlope")
         print(point1)
         print(point2)
@@ -64,27 +64,27 @@ def findIntersection(point1, point2, point3, point4):
         print(point1)
         print(point2)
         print(point3)
-        print(point4)
+        print(point4)'''
     
     if firstLineSlope == float('inf'):
         intersection = [
             firstLinePoint[0],
             -1*secondLineSlope*firstLinePoint[0]+c2]
-        x_coord = intersection[0]
-        y_coord = intersection[1]
-        dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="black",width=0)
-        print("First Inf")
-        print(intersection)
+        #x_coord = intersection[0]
+        #y_coord = intersection[1]
+        #dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="black",width=0)
+        #print("First Inf")
+        #print(intersection)
     elif secondLineSlope == float('inf'):
         intersection = [
             secondLinePoint[0],
             -1*firstLineSlope*secondLinePoint[0]+c1]
-        x_coord = intersection[0]
-        y_coord = intersection[1]
-        dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="black",width=0)
+        #x_coord = intersection[0]
+        #y_coord = intersection[1]
+        #dot_circle = myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="black",width=0)
         
-        print("Second Inf")
-        print(intersection)
+        #print("Second Inf")
+        #print(intersection)
     elif firstLineSlope != float('inf') and secondLineSlope != float('inf'):
         intersection = [
             -1*(b1*c2-b2*c1)/(a1*b2-a2*b1),
@@ -107,14 +107,8 @@ def findIntersection(point1, point2, point3, point4):
     return intersection
 
 def findCircle(point1, point2, point3):
-    #firstLineSlope = (point2[1] - point1[1])/(point2[0]-point1[0])*(-0.5)
-    firstLinePoint = [(point2[0] + point1[0])/2, (point2[1]+point1[1])/2]
-    
-    #secondLineSlope = (point3[1] - point1[1])/(point3[0]-point1[0])*(-0.5)
-    #secondLinePoint = [(point3[0] + point1[0])/2, (point3[1]+point1[1])/2]
-    
-    circleCenter = findIntersection(point1, point2, point1, point3)
-    radius = abs(pythagMyBro(circleCenter, firstLinePoint))
+    circleCenter = findIntersection(point1, point2, point2, point3)
+    radius = abs(pythagMyBro(circleCenter, point1))
     
     return [circleCenter, radius]
     
@@ -257,7 +251,8 @@ def restart_program():
     python = sys.executable
     os.execl(python, python, * sys.argv)
 
-
+def FindTriangulation():
+    pass
    
 myTk.bind("<Button-1>", draw_dots)
 
