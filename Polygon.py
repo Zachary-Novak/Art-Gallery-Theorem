@@ -10,6 +10,9 @@ class Polygon:
     def restart_program(self):
         python = sys.executable
         os.execl(python, python, * sys.argv)
+    
+    def draw_again(self):
+        self.myTk.bind("<Button-1>", self.draw_dots)
         
     def draw_dots(self, event):
         if not self.finishedHull:
@@ -66,6 +69,7 @@ class Polygon:
         self.finishedHull = False
         
         self.myTk.bind("<Button-1>", self.draw_dots)
+        self.myTk.bind("<space>", self.draw_dots)
 
         quit_button = Button(self.myTk, text="Exit")
         quit_button.pack(side="bottom")
@@ -73,6 +77,9 @@ class Polygon:
         triangulate_button = Button(self.myTk, text="Triangulate", highlightcolor="black")
         triangulate_button.pack(side="top")
         triangulate_button["command"] = self.triangulate
+        draw_new_button = Button(self.myTk, text = "Draw Again")
+        draw_new_button.pack(side="top")
+        draw_new_button["command"] = self.draw_again
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
@@ -249,11 +256,11 @@ class Polygon:
     
     def findSlopeFromThreePoints(self, point1, point2, point3):
         slope1 = (point2[1]-point1[1])/(point2[0]-point1[0])
-        print(slope1)
+        #print(slope1)
         slope2 = (point3[1]-point2[1])/(point3[0]-point2[0])
-        print(slope2)
+        #print(slope2)
         finalSlope = (slope1+slope2)/2
-        print(finalSlope)
+        #print(finalSlope)
         return finalSlope
     
     def triangulate(self):
@@ -265,18 +272,50 @@ class Polygon:
         print(point2)
         print(point3)
         
-        castingSlope = self.findSlopeFromThreePoints(point1, point2, point3)
+        #castingSlope = self.findSlopeFromThreePoints(point1, point2, point3)
         dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
-        dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
-        #dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
-        x = 200 + point2[0]
-        y = 200 * castingSlope + point2[1]
-       
+        #dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
+        dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
+        '''x = 200 + point2[0]
+        y = 200 * castingSlope + point2[1]'''
         
+        x = (point3[0] + point1[0])/2
+        y = (point3[1] + point1[1])/2
+        endPoint = [x, y]
+        slope = (endPoint[1] + point2[1])/(endPoint[0] + point2[0])
+        intersection = self.findIntersection(point2, endPoint, point1, point3)
+        dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="red",fill="red",width=0)
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
         #y = x*castingSlope + point2[1]
-        endPoint = [x, y]
+        
+        '''angle1 = self.findAngle(endPoint, point2, [point2[0] + 1, point2[1]])
+        angle2 = self.findAngle(point1, point2, [point2[0] + 1, point2[1]])
+        if (angle2 < 0):
+            angle2 = angle2 + 360
+        angle3 = self.findAngle(point3, point2, [point2[0] + 1, point2[1]])
+        if (angle3 < 0):
+            angle3 = angle3 + 360'''
+            
+        '''firstCheck = self.leftOf(point2, endPoint, point1)
+        print(firstCheck)
+        secondCheck = self.leftOf(point2, endPoint, point3)
+        print(secondCheck)
+        
+        selfCheck1 = self.leftOf(point2, point1, endPoint)
+        print(selfCheck1)
+        selfCheck2 = self.leftOf(point2, point3, endPoint)
+        print(selfCheck2)
+        if firstCheck != secondCheck and not firstCheck == selfCheck2 and not secondCheck == selfCheck1:
+            print("Success")'''
+        
+        '''angle1 = self.findAngle(endPoint, point2, point1)
+        angle2 = self.findAngle(point1, point2, point3)
+        
+        angles = [angle1, angle2]'''
+        
+        
+        #print(angles)
         dot_circle = self.myCanvas.create_line([self.hull[0], self.hull[1]], endPoint, fill="Black")
         
         iterator = [point2, point3, point1]
@@ -284,8 +323,7 @@ class Polygon:
         print("Doing this")
         print(endPoint)
         intersection = self.findIntersection(point2, endPoint, point1, point3)
-        if intersection == True:
-            print("success")
+
         
         
         '''i = 0
