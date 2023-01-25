@@ -10,9 +10,6 @@ class Polygon:
     def restart_program(self):
         python = sys.executable
         os.execl(python, python, * sys.argv)
-    
-    def draw_again(self):
-        self.myTk.bind("<Button-1>", self.draw_dots)
         
     def draw_dots(self, event):
         if not self.finishedHull:
@@ -69,7 +66,6 @@ class Polygon:
         self.finishedHull = False
         
         self.myTk.bind("<Button-1>", self.draw_dots)
-        self.myTk.bind("<space>", self.draw_dots)
 
         quit_button = Button(self.myTk, text="Exit")
         quit_button.pack(side="bottom")
@@ -225,20 +221,20 @@ class Polygon:
             #print(str(point3[1]) + " " + str(point4[1]) + " " + str(intersection[1]) + " " + str(min([point3[1], point4[1], intersection[1]])))
             #print("\n")
             if (intersection != [float('inf'), float('inf')]):
-                #print("First Passed")
+                print("First Passed")
                 if (min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point2[0]):# and (intersection[1] != point1[1] and intersection[1] != point2[1])):
-                    #print("Second Passed")
+                    print("Second Passed")
                     if (min([point1[1], point2[1], intersection[1]]) != intersection[1] and max([point1[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == point1[1] and intersection[1] == point2[1]):# and (intersection[0] != point1[0] and intersection[0] != point2[0])):
-                        #print("Third Passed")
+                        print("Third Passed")
                         if (min([point3[0], point4[0], intersection[0]]) != intersection[0] and max([point3[0], point4[0], intersection[0]]) != intersection[0]) or (intersection[0] == point3[0] and intersection[0] == point4[0]):# and (intersection[1] != point3[1] and intersection[1] != point4[1])):
-                            #print("Fourth Passed")
+                            print("Fourth Passed")
                             if (min([point3[1], point4[1], intersection[1]]) != intersection[1] and max([point3[1], point4[1], intersection[1]]) != intersection[1])  or (intersection[1] == point3[1] and intersection[1] == point4[1]):# and (intersection[0] != point3[0] and intersection[0] != point4[0])):
-                                #print("\nIntersection Testing!   Points: " + str((counter/2)+0.5) + " " + str((counter/2)-0.5))
-                                #print(point1)
-                                #print(point2)
-                                #print(point3)
-                                #print(point4)
-                                #print(intersection)
+                                print("\nIntersection Testing!   Points: " + str((counter/2)+0.5) + " " + str((counter/2)-0.5))
+                                print(point1)
+                                print(point2)
+                                print(point3)
+                                print(point4)
+                                print(intersection)
                                 return True
             '''if (intersection != [float('inf'), float('inf')] and 
                 ((intersection[1] == point1[1] or intersection[1] == point2[1]) and 
@@ -254,10 +250,6 @@ class Polygon:
     def findAngle(self, point1, point2, point3):
         return math.degrees(math.atan2(point3[1] - point2[1], point3[0] - point2[0]) - math.atan2(point1[1]-point2[1],point1[0] - point2[0]))
     
-    def findSlopeFromTwoPoints(self, point1, point2):
-        slope = (point2[1] - point1[1])/(point2[0] - point1[0])
-        return slope
-    
     def findSlopeFromThreePoints(self, point1, point2, point3):
         slope1 = (point2[1]-point1[1])/(point2[0]-point1[0])
         #print(slope1)
@@ -269,76 +261,26 @@ class Polygon:
     
     def triangulate(self):
         
-        hullCopy = self.hull
-        
-        point1 = [self.hull[0], self.hull[1]]
-        point2 = [self.hull[2], self.hull[3]]
-        point3 = [self.hull[4], self.hull[5]]
+        point1 = [self.hull[-2], self.hull[-1]]
+        point2 = [self.hull[0], self.hull[1]]
+        point3 = [self.hull[2], self.hull[3]]
         print(point1)
         print(point2)
         print(point3)
         
         #castingSlope = self.findSlopeFromThreePoints(point1, point2, point3)
-        
+        dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
         #dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
-        
+        dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
         '''x = 200 + point2[0]
         y = 200 * castingSlope + point2[1]'''
         
         x = (point3[0] + point1[0])/2
         y = (point3[1] + point1[1])/2
         endPoint = [x, y]
-        
-        
-        endSlope = self.findSlopeFromTwoPoints(point2, endPoint)
-        if endPoint[0] > point2[0]:
-            endPoint[0] = endPoint[0] + 1000
-            endPoint[1] = endPoint[1] + (endSlope*1000)
-        else:
-            endPoint[0] = endPoint[0] - 1000
-            endPoint[1] = endPoint[1] - (endSlope*1000)
-        
-        iterator = []
-        isEar = False
-        iterator.clear()
-        counter = 2
-        while counter < len(self.hull):
-            iterator.append(counter)
-            counter += 1
-        counter = 0
-        while counter < 4:
-            iterator.append(counter)
-            counter += 1
-            
-        print(iterator)
-        
-        #intersection = self.findIntersection(point2, endPoint, point1, point3)
-        dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
-        
-        dot_circle = self.myCanvas.create_line([point2[0], point2[1]], endPoint, fill="black")
-        
-        dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
-        #dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="red",fill="red",width=0)
-        totalIntersections = 0
-        i = 0
-        while i < (len(iterator)-4):
-            point1 = [hullCopy[iterator[i]], hullCopy[iterator[i+1]]]
-            point3 = [hullCopy[iterator[i+2]], hullCopy[iterator[i+3]]]
-            intersection = self.findIntersection(point2, endPoint, point1, point3)
-            if (intersection != [float('inf'), float('inf')]) and intersection != point2:
-                print("First Passed")
-                if (min([point1[0], point3[0], intersection[0]]) != intersection[0] and max([point1[0], point3[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point3[0]):
-                    print("Second Passed")
-                    if (min([point1[1], point3[1], intersection[1]]) != intersection[1] and max([point1[1], point3[1], intersection[1]]) != intersection[1]) or (intersection[1] == point3[1] and intersection[1] == point3[1]):
-                        print("Third Passed")
-                        if (min([endPoint[1], point2[1], intersection[1]]) != intersection[1] and max([endPoint[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == endPoint[1] and intersection[1] == point2[1]):
-                            totalIntersections += 1
-                            dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="yellow",fill="yellow",width=0)
-            i = i + 2
-        print("Total Intersctions: " + str(totalIntersections))             
-        
-        
-
+        slope = (endPoint[1] + point2[1])/(endPoint[0] + point2[0])
+        intersection = self.findIntersection(point2, endPoint, point1, point3)
+        dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="red",fill="red",width=0)
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
         #y = x*castingSlope + point2[1]
@@ -370,12 +312,13 @@ class Polygon:
         
         
         #print(angles)
+        dot_circle = self.myCanvas.create_line([self.hull[0], self.hull[1]], endPoint, fill="Black")
         
-        '''iterator = [point2, point3, point1]
+        iterator = [point2, point3, point1]
         j = 1
         print("Doing this")
         print(endPoint)
-        intersection = self.findIntersection(point2, endPoint, point1, point3)'''
+        intersection = self.findIntersection(point2, endPoint, point1, point3)
 
         
         
