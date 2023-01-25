@@ -27,9 +27,10 @@ class Polygon:
                 self.destroyList.clear()
             if len(self.hull) > 4 and (math.sqrt(pow((y_coord-self.hull[1]), 2) + pow((x_coord-self.hull[0]), 2))) < 5:
                 #print(len(pointList))
-                print("FoundEnd)")
+                #print("FoundEnd)")
                 anything = self.myCanvas.create_line(self.pointList[0], self.pointList[1], self.hull[0], self.hull[1], fill="blue")
-                anything2 = self.myCanvas.create_polygon
+                self.hull.pop()
+                self.hull.pop()
                 self.finishedHull = True
             else:
                 if len(self.pointList) == 2:
@@ -68,6 +69,9 @@ class Polygon:
         quit_button = Button(self.myTk, text="Exit")
         quit_button.pack(side="bottom")
         quit_button["command"] = self.myTk.destroy
+        triangulate_button = Button(self.myTk, text="Triangulate", highlightcolor="black")
+        triangulate_button.pack(side="top")
+        triangulate_button["command"] = self.triangulate
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
@@ -180,10 +184,10 @@ class Polygon:
 
     def checkForCross(self):
         counter = len(self.hull)-1
-        print("counter is " + str(counter))
-        print("hull is ")
-        print(self.hull)
-        print("\n")
+        #print("counter is " + str(counter))
+        #print("hull is ")
+        #print(self.hull)
+        #print("\n")
         newPoint = counter
         counter -= 4
         while counter > 2:
@@ -244,13 +248,47 @@ class Polygon:
     
     def findSlopeFromThreePoints(self, point1, point2, point3):
         slope1 = (point2[1]-point1[1])/(point2[0]-point1[0])
+        print(slope1)
         slope2 = (point3[1]-point2[1])/(point3[0]-point2[0])
-        return (slope1+slope2)/2
+        print(slope2)
+        finalSlope = (slope1+slope2)/2
+        print(finalSlope)
+        return finalSlope
     
     def triangulate(self):
-        i = 0
+        
+        point1 = [self.hull[-2], self.hull[-1]]
+        point2 = [self.hull[0], self.hull[1]]
+        point3 = [self.hull[2], self.hull[3]]
+        print(point1)
+        print(point2)
+        print(point3)
+        
+        castingSlope = self.findSlopeFromThreePoints(point1, point2, point3)
+        dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
+        #dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
+        dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
+        x = 200 + point2[0]
+        y = 200 * castingSlope + point2[1]
+        
+        
+        #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
+        #y = x*castingSlope + point2[1]
+        endPoint = [x, y]
+        dot_circle = self.myCanvas.create_line([self.hull[0], self.hull[1]], endPoint, fill="Black")
+        
+        iterator = [point2, point3, point1]
+        j = 1
+        print("Doing this")
+        print(endPoint)
+        intersection = self.findIntersection(point2, endPoint, point1, point3)
+        if intersection == True:
+            print("success")
+        
+        
+        '''i = 0
         iterator = []
-        while i < len(self.hull):
+        while i < len(self.hull)-6:
             isEar = False
             iterator.clear()
             counter = i
@@ -264,27 +302,40 @@ class Polygon:
             
             castingSlope = self.findSlopeFromThreePoints([self.hull[iterator[i]], self.hull[iterator[i+1]]], [self.hull[iterator[i+2]], self.hull[iterator[i+3]]], [self.hull[iterator[i+4]], self.hull[iterator[i+5]]])
 
-            x = math.sqrt(pow(2000, 2)/(castingSlope^2 + 1)) + self.hull[i]
+            x = math.sqrt(pow(2000, 2)/(pow(castingSlope, 2) + 1)) + self.hull[i]
             y = x*castingSlope + self.hull[i+1]
             
             
             endPoint = [x, y]
             totalIntersections = 0
-            while j < len(iterator)-2:
-                intersection = self.findIntersection([self.hull[iterator[i]], self.hull[iterator[i+1]]], endPoint, [self.hull[iterator[j+2]], self.hull[iterator[j+3]]], [self.hull[iterator[j+4], self.hull[iterator[j+5]]]])
+            j = 0
+            while j < len(iterator)-6:
+                #print(type([self.hull[iterator[i]], self.hull[iterator[i+1]]]))
+                #print(type(endPoint))
+                #print(type([self.hull[iterator[j+2]], self.hull[iterator[j+3]]]))
+                #print(type([self.hull[iterator[j+4]], self.hull[iterator[j+5]]]))
+                #intersectionParameter = [[self.hull[iterator[i]], self.hull[iterator[i+1]]], endPoint, [self.hull[iterator[j+2]], self.hull[iterator[j+3]]], [self.hull[iterator[j+4]], self.hull[iterator[j+5]]]]
+                #print(intersectionParameter)
+                dot_circle = self.myCanvas.create_line([self.hull[iterator[i]], self.hull[iterator[i+1]]], endPoint, fill="Black")
+                print("Doing this")
+                print(endPoint)
+                intersection = self.findIntersection([self.hull[iterator[i]], self.hull[iterator[i+1]]], endPoint, [self.hull[iterator[j+2]], self.hull[iterator[j+3]]], [self.hull[iterator[j+4]], self.hull[iterator[j+5]]])
                 if intersection == True:
                     totalIntersections += 1
                 j += 2
             if totalIntersections%2 == 0:
+                print("Didn't Find Ear, " + str(totalIntersections) + " intersections")
                 isEar = False
             else:
                 isEar = True
+                print("Found Ear, " + str(totalIntersections) + " intersections")
                 
             if isEar:
+                print("adding Triangle")
                 triangle = self.myCanvas.create_polygon(self.hull[iterator[i]], self.hull[iterator[i+1]], self.hull[iterator[j+2]], self.hull[iterator[j+3]], self.hull[iterator[j+4], self.hull[iterator[j+5]]], fill="lemonchiffon")
-                pass
+            print(i)
             
-            i += 2
+            i += 2'''
             
     def createScreen(self):
         self.myCanvas.pack()
