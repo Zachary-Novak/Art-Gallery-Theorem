@@ -1,5 +1,6 @@
 from asyncio import events
 from tkinter import *
+#import matplotlib.pyplot as plt
 import math
 import sys
 import os
@@ -266,10 +267,11 @@ class Polygon:
         
         castingSlope = self.findSlopeFromThreePoints(point1, point2, point3)
         dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
-        #dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
-        dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
+        dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
+        #dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
         x = 200 + point2[0]
         y = 200 * castingSlope + point2[1]
+       
         
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
@@ -336,6 +338,8 @@ class Polygon:
             print(i)
             
             i += 2'''
+    
+        
             
     def createScreen(self):
         self.myCanvas.pack()
