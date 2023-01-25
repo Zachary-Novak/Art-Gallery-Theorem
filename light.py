@@ -74,7 +74,7 @@ def change_line_type(event):
     global linetype
     linetype = (linetype+1)%3
     if linetype == 0:
-        #myCanvas.create_polygon(pointList[0],pointList[1],pointList[2],pointList[3],pointList[4],pointList[5], fill="yellow", width=0)
+        myCanvas.create_polygon(pointList[0],pointList[1],pointList[2],pointList[3],pointList[4],pointList[5], fill="yellow", width=0)
         hi = 2
     if linetype == 1:
         r1x = pointList[0]-pointList[4]
@@ -83,7 +83,7 @@ def change_line_type(event):
         r2y = pointList[3]-pointList[5]
         x1set = (r1x > 0)*Canvasx
         x2set = (r2x > 0)*Canvasx
-        #myCanvas.create_polygon(pointList[4], pointList[5], x1set, pointList[5]+(x1set-pointList[4])*r1y/r1x, x2set, pointList[5]+(x2set-pointList[4])*r2y/r2x, fill="red")
+        myCanvas.create_polygon(pointList[4], pointList[5], x1set, pointList[5]+(x1set-pointList[4])*r1y/r1x, x2set, pointList[5]+(x2set-pointList[4])*r2y/r2x, fill="red")
     if linetype == 2:
         v1 = [pointList[4]-pointList[0], pointList[5]-pointList[1]]
         v2 = [pointList[2]-pointList[0], pointList[3]-pointList[1]]
