@@ -2,8 +2,9 @@ from tkinter import *
 import math
 
 myTk = Tk()
-myTk.title("Triangle Testing")
+myTk.title("Clicking and spacebar do things")
 myCanvas = Canvas(myTk, bd=4, bg="skyblue", cursor="circle", height = 600, width = 1000)
+
 '''variables that the light takes as input'''
 light = [] #coordinates of the light source
 pointList = []#list of points stored as [xcoord1, ycoord1], [xcoord2, ycoord2], ...
@@ -20,7 +21,9 @@ pc = -1 #number of polygonpoints plotted.
 trianglemaker = [] #for adding a triangle in the drawsegment section
 pointtracker = 0 #which point we are at in adding a new triangle
 pointsave = []
-edgetypesave = [0,0]
+edgetypesave = [0,0,0]
+shineQ = False
+absorbedQ = False
 
 def d2(point1, point2): #distance, but without the square root
     return pow((point2[1]-point1[1]),2)+pow(point2[0]-point1[0],2)
@@ -33,11 +36,12 @@ def draw_segment(event): #used to generate the triangulated polygon, don't use i
     elif pc < 3:
         pointList.append([event.x, event.y])
         pointdraw.append(myCanvas.create_oval(pointList[pc][0]-5,pointList[pc][1]-5,pointList[pc][0]+5,pointList[pc][1]+5,fill="green",width=0))
+        edgetypesave[pc] = linetype
         if pc == 2:
-            edgeList = [[1,0, linetype], [2,1, linetype], [2,0, linetype]]
-            edgedraw.append(myCanvas.create_line(pointList[edgeList[0][0]][0], pointList[edgeList[0][0]][1], pointList[edgeList[0][1]][0], pointList[edgeList[0][1]][1]))
-            edgedraw.append(myCanvas.create_line(pointList[edgeList[1][0]][0], pointList[edgeList[1][0]][1], pointList[edgeList[1][1]][0], pointList[edgeList[1][1]][1]))
-            edgedraw.append(myCanvas.create_line(pointList[edgeList[2][0]][0], pointList[edgeList[2][0]][1], pointList[edgeList[2][1]][0], pointList[edgeList[2][1]][1]))
+            edgeList = [[1,0, edgetypesave[0]], [2,1, edgetypesave[1]], [2,0, edgetypesave[2]]]
+            edgedraw.append(myCanvas.create_line(pointList[edgeList[0][0]][0], pointList[edgeList[0][0]][1], pointList[edgeList[0][1]][0], pointList[edgeList[0][1]][1], fill=["black", "magenta"][edgetypesave[0]]))
+            edgedraw.append(myCanvas.create_line(pointList[edgeList[1][0]][0], pointList[edgeList[1][0]][1], pointList[edgeList[1][1]][0], pointList[edgeList[1][1]][1], fill=["black", "magenta"][edgetypesave[1]]))
+            edgedraw.append(myCanvas.create_line(pointList[edgeList[2][0]][0], pointList[edgeList[2][0]][1], pointList[edgeList[2][1]][0], pointList[edgeList[2][1]][1], fill=["black", "magenta"][edgetypesave[2]]))
             pointmap[0] = 0
             pointmap[2] = 1
             pointmap[1] = 2
@@ -94,8 +98,12 @@ def draw_segment(event): #used to generate the triangulated polygon, don't use i
         pointtracker = (pointtracker+1)%3
 
 def change_line_type(event):
-    global linetype
-    linetype = 1-linetype
+    if not shineQ:
+        global linetype
+        linetype = 1-linetype
+    elif not absorbedQ:
+        if len(edgeQueue)==0:
+            print("hi")
     '''if linetype == 0:
         myCanvas.create_polygon(pointList[0],pointList[1],pointList[2],pointList[3],pointList[4],pointList[5], fill="yellow", width=0)
         hi = 2
