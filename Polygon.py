@@ -1,8 +1,10 @@
 from asyncio import events
 from tkinter import *
+import numpy
 import math
 import sys
 import os
+import time
 
 
 class Polygon:
@@ -247,7 +249,10 @@ class Polygon:
         return math.degrees(math.atan2(point3[1] - point2[1], point3[0] - point2[0]) - math.atan2(point1[1]-point2[1],point1[0] - point2[0]))
     
     def findSlopeFromTwoPoints(self, point1, point2):
-        slope = (point2[1] - point1[1])/(point2[0] - point1[0])
+        try:
+            slope = (point2[1] - point1[1])/(point2[0] - point1[0])
+        except:
+            slope = float('inf')
         return slope
     
     def findSlopeFromThreePoints(self, point1, point2, point3):
@@ -259,76 +264,156 @@ class Polygon:
         #print(finalSlope)
         return finalSlope
     
+    def isIntersectionTouchingLineSegments(self, intersection, point1, point2, point3, point4):
+        if (round(intersection[0]) != point2[0] and round(intersection[1] != point2[1])):
+            print("First Passed")
+            if (min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point2[0]):
+                print("Second Passed")
+                if (min([point1[1], point2[1], intersection[1]]) != intersection[1] and max([point1[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == point1[1] and intersection[1] == point2[1]):
+                    print("Third Passed")
+                    if (min([point3[1], point4[1], intersection[1]]) != intersection[1] and max([point3[1], point4[1], intersection[1]]) != intersection[1]) or (intersection[1] == point3[1] and intersection[1] == point4[1]):
+                        print("Fourth Passed")
+                        if (min([point3[0], point4[0], intersection[0]]) != intersection[0] and max([point3[0], point4[0], intersection[0]]) != intersection[0]) or (intersection[0] == point3[0] and intersection[0] == point4[0]):
+                            return True
+        return False
+    
     def triangulate(self):
         
         hullCopy = self.hull
+        #hullCopy.append(hullCopy[0])
+        #hullCopy.append(hullCopy[1])
+        print(hullCopy)
         
-        point1 = [self.hull[0], self.hull[1]]
-        point2 = [self.hull[2], self.hull[3]]
-        point3 = [self.hull[4], self.hull[5]]
-        print(point1)
-        print(point2)
-        print(point3)
+        stopped = 0
         
-        #castingSlope = self.findSlopeFromThreePoints(point1, point2, point3)
-        
-        #dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="black",fill="black",width=0)
-        
-        '''x = 200 + point2[0]
-        y = 200 * castingSlope + point2[1]'''
-        
-        x = (point3[0] + point1[0])/2
-        y = (point3[1] + point1[1])/2
-        endPoint = [x, y]
-        
-        
-        endSlope = self.findSlopeFromTwoPoints(point2, endPoint)
-        if endPoint[0] > point2[0]:
-            endPoint[0] = endPoint[0] + 1000
-            endPoint[1] = endPoint[1] + (endSlope*1000)
-        else:
-            endPoint[0] = endPoint[0] - 1000
-            endPoint[1] = endPoint[1] - (endSlope*1000)
-        
-        iterator = []
-        isEar = False
-        iterator.clear()
-        counter = 2
-        while counter < len(self.hull):
-            iterator.append(counter)
-            counter += 1
-        counter = 0
-        while counter < 4:
-            iterator.append(counter)
-            counter += 1
+        hullCounter = 0
+        '''(len(hullCopy) - 4)'''
+        while len(hullCopy) >= 6 and stopped < 100:
+            print(hullCopy)
+            if False:
+                point1 = [hullCopy[hullCounter-4], hullCopy[hullCounter-3]]
+            else:
+                point1 = [hullCopy[hullCounter-2], hullCopy[hullCounter-1]]
+            point2 = [hullCopy[hullCounter+0], hullCopy[hullCounter+1]]
+            point3 = [hullCopy[hullCounter+2], hullCopy[hullCounter+3]]
+            #print(point1)
+            #print(point2)
+            #print(point3)
+            x = (point3[0] + point1[0])/2
+            y = (point3[1] + point1[1])/2
+            endPoint = [x, y]
+            endSlope = self.findSlopeFromTwoPoints(point2, endPoint)
+            if endPoint[0] > point2[0]:
+                endPoint[0] = endPoint[0] + 1000
+                endPoint[1] = endPoint[1] + (endSlope*1000)
+            else:
+                endPoint[0] = endPoint[0] - 1000
+                endPoint[1] = endPoint[1] - (endSlope*1000)
+            iterator = []
+            isEar = False
+            iterator.clear()
+            counter = hullCounter
+            while counter < len(hullCopy):
+                iterator.append(counter)
+                counter += 1
+            counter = 0
+            while counter < hullCounter:
+                iterator.append(counter)
+                counter += 1
+            #print(iterator)
+            #intersection = self.findIntersection(point2, endPoint, point1, point3)
+            #dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
+            #dot_circle = self.myCanvas.create_line([point2[0], point2[1]], endPoint, fill="black")
+            #dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
+            #dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="red",fill="red",width=0)
+            totalIntersections = 0
+            i = 0
+            while i < (len(iterator)-2):
+               # print('i: ' + str(i))
+                point1 = [hullCopy[iterator[i]], hullCopy[iterator[i+1]]]
+                point3 = [hullCopy[iterator[i+2]], hullCopy[iterator[i+3]]]
+                intersection = self.findIntersection(point2, endPoint, point1, point3)
+                if (intersection != [float('inf'), float('inf')]) and not math.isnan(intersection[0]) and not math.isnan(intersection[1]):
+                    #print("intersection testing")
+                    #print(intersection)
+                    #print(point2)
+                    if (round(intersection[0]) != point2[0] and round(intersection[1] != point2[1])):
+                        #print("First Passed")
+                        if (min([point1[0], point3[0], intersection[0]]) != intersection[0] and max([point1[0], point3[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point3[0]):
+                            #print("Second Passed")
+                            if (min([point1[1], point3[1], intersection[1]]) != intersection[1] and max([point1[1], point3[1], intersection[1]]) != intersection[1]) or (intersection[1] == point1[1] and intersection[1] == point3[1]):
+                                #print("Third Passed")
+                                if (min([endPoint[1], point2[1], intersection[1]]) != intersection[1] and max([endPoint[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == endPoint[1] and intersection[1] == point2[1]):
+                                    #print("Fourth Passed")
+                                    if (min([endPoint[0], point2[0], intersection[0]]) != intersection[0] and max([endPoint[0], point2[0], intersection[0]]) != intersection[0]) or (intersection[0] == endPoint[0] and intersection[0] == point2[0]):
+                                        totalIntersections += 1
+                                        #dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="yellow",fill="yellow",width=0)
+                i = i + 2
+            #print("Total Intersctions: " + str(totalIntersections))
+            point1 = [hullCopy[hullCounter-2], hullCopy[hullCounter-1]]
+            #dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="yellow",fill="yellow",width=0)
+            point2 = [hullCopy[hullCounter+0], hullCopy[hullCounter+1]]
+            #dot_circle = self.myCanvas.create_oval(point2[0]-5,point2[1]-5,point2[0]+5,point2[1]+5,outline="yellow",fill="yellow",width=0)
+            point3 = [hullCopy[hullCounter+2], hullCopy[hullCounter+3]]  
+            #dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="yellow",fill="yellow",width=0)
+            checkerForTrue = False
+            if (totalIntersections%2 == 1):
+                otherCopyHull = hullCopy
+                copyCounter = 0
+                copyIntersections = 0
+                print(point1)
+                print(point2)
+                print(point3)
+                while copyCounter < len(otherCopyHull)-1:
+                    copyPoint = [otherCopyHull[copyCounter], otherCopyHull[copyCounter+1]]
+                    leftCopyPoint = [otherCopyHull[copyCounter] + 1000, otherCopyHull[copyCounter+1]+1]
+                    if copyPoint != point1 and copyPoint != point2 and copyPoint != point3:
+                        #dot_circle = self.myCanvas.create_line([copyPoint[0], copyPoint[1]], leftCopyPoint[0], leftCopyPoint[1], fill="black")
+                        print(copyPoint)
+                        newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point1, point2)
+                        #dot_circle = self.myCanvas.create_oval(copyPoint[0]-5,copyPoint[1]-5,copyPoint[0]+5,copyPoint[1]+5,outline="black",fill="black",width=0)
+                        #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
+                        print(newIntersection)
+                        if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point1, point2)):
+                            copyIntersections += 1
+                        newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point2, point3)
+                        #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
+                        print(newIntersection)
+                        if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point2, point3)):
+                            copyIntersections += 1
+                        newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point1, point3)
+                        #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
+                        print(newIntersection)
+                        if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point1, point3)):
+                            copyIntersections += 1
+                        print("\nBreak\n")
+                    copyCounter += 2
+                if copyIntersections%2 == 0:
+                    triangle = self.myCanvas.create_polygon(point1[0], point1[1], point2[0], point2[1], point3[0], point3[1], fill="lemonchiffon")
+                    triangle = self.myCanvas.create_line(point1[0], point1[1], point2[0], point2[1], fill="red", width=3)
+                    triangle = self.myCanvas.create_line(point3[0], point3[1], point2[0], point2[1], fill="red", width=3)
+                    triangle = self.myCanvas.create_line(point1[0], point1[1], point3[0], point3[1], fill="red", width=3)
+                    self.myCanvas.pack()
+                    print("making Triangle" + str(copyIntersections))
+                    #time.sleep(1)
+                else:
+                    checkerForTrue = True
+            else:
+                checkerForTrue = True
+            if checkerForTrue:
+                print("notPopping")
+                hullCopy.append(hullCopy[0])
+                hullCopy.append(hullCopy[1])
+                hullCopy.pop(0)
+                hullCopy.pop(0)
+            else:
+                print("Popping")
+                hullCopy.pop(0)
+                hullCopy.pop(0)
+            stopped += 1
             
-        print(iterator)
-        
-        #intersection = self.findIntersection(point2, endPoint, point1, point3)
-        dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
-        
-        dot_circle = self.myCanvas.create_line([point2[0], point2[1]], endPoint, fill="black")
-        
-        dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="black",fill="black",width=0)
-        #dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="red",fill="red",width=0)
-        totalIntersections = 0
-        i = 0
-        while i < (len(iterator)-4):
-            point1 = [hullCopy[iterator[i]], hullCopy[iterator[i+1]]]
-            point3 = [hullCopy[iterator[i+2]], hullCopy[iterator[i+3]]]
-            intersection = self.findIntersection(point2, endPoint, point1, point3)
-            if (intersection != [float('inf'), float('inf')]) and intersection != point2:
-                print("First Passed")
-                if (min([point1[0], point3[0], intersection[0]]) != intersection[0] and max([point1[0], point3[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point3[0]):
-                    print("Second Passed")
-                    if (min([point1[1], point3[1], intersection[1]]) != intersection[1] and max([point1[1], point3[1], intersection[1]]) != intersection[1]) or (intersection[1] == point3[1] and intersection[1] == point3[1]):
-                        print("Third Passed")
-                        if (min([endPoint[1], point2[1], intersection[1]]) != intersection[1] and max([endPoint[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == endPoint[1] and intersection[1] == point2[1]):
-                            totalIntersections += 1
-                            dot_circle = self.myCanvas.create_oval(intersection[0]-5,intersection[1]-5,intersection[0]+5,intersection[1]+5,outline="yellow",fill="yellow",width=0)
-            i = i + 2
-        print("Total Intersctions: " + str(totalIntersections))             
-        
+        if stopped == 0:
+            print("done?")
         
 
         
