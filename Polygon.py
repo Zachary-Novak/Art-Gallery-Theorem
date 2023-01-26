@@ -55,6 +55,15 @@ class Polygon:
                     self.hull.pop()
                     self.pointList.pop()
                     self.pointList.pop()
+    
+    def delete_everything(self):
+        self.myCanvas.delete("all")
+        self.hull.clear()
+        self.finishedHull = False
+    
+    def click_action(self):
+        entered_text = self.entry.get()
+        
         
     def __init__(self):
         self.myTk = Tk()
@@ -68,7 +77,7 @@ class Polygon:
         
         self.myTk.bind("<Button-1>", self.draw_dots)
 
-        quit_button = Button(self.myTk, text="Exit")
+        quit_button = Button(self.myTk, text='Exit', bg='black', fg='white')
         quit_button.pack(side="bottom")
         quit_button["command"] = self.myTk.destroy
         triangulate_button = Button(self.myTk, text="Triangulate", highlightcolor="black")
@@ -76,10 +85,32 @@ class Polygon:
         triangulate_button["command"] = self.triangulate
         draw_new_button = Button(self.myTk, text = "Clear")
         draw_new_button.pack(side="top")
-        draw_new_button["command"] = self.myCanvas.delete("all")
+        draw_new_button["command"] = self.delete_everything
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
+        
+        """menu_bar = Menu(self.myTk)
+        drop_down = Menu(menu_bar)
+        drop_down.add_command(label = "Normal Polygon", command = self.red_color)
+        drop_down.add_command(label = "Polygon with mirrors", command = self.red_color)
+        menu_bar.add_cascade(label = "Options", menu = drop_down)
+        self.myTk.config(menu = menu_bar)"""
+        
+        options = [
+            'Normal Polygon',
+            'Polygon with mirrors',
+            
+        ]
+        
+        drop_down = StringVar(self.myTk)
+        drop_down.set("Options") # this is the default value
+        show = OptionMenu(self.myTk, drop_down, *options)
+        show.pack()
+        
+        
+        
+        
         
     def pythagMyBro(self, point1, point2):
         return math.sqrt(pow(point2[1] - point1[1], 2) + pow(point2[0] - point1[0]))
