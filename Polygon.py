@@ -59,6 +59,7 @@ class Polygon:
     def delete_everything(self):
         self.myCanvas.delete("all")
         self.hull.clear()
+        self.pointList.clear()
         self.finishedHull = False
     
     def click_action(self):
