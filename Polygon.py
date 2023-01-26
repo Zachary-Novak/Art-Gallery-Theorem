@@ -1,10 +1,10 @@
 from asyncio import events
 from tkinter import *
-import numpy
+#import matplotlib.pyplot as plt
 import math
 import sys
 import os
-import time
+from turtle import left
 
 
 class Polygon:
@@ -74,6 +74,9 @@ class Polygon:
         triangulate_button = Button(self.myTk, text="Triangulate", highlightcolor="black")
         triangulate_button.pack(side="top")
         triangulate_button["command"] = self.triangulate
+        draw_new_button = Button(self.myTk, text = "Clear")
+        draw_new_button.pack(side="top")
+        draw_new_button["command"] = self.myCanvas.delete("all")
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
@@ -288,7 +291,7 @@ class Polygon:
         
         hullCounter = 0
         '''(len(hullCopy) - 4)'''
-        while len(hullCopy) >= 6 and stopped < 100:
+        while len(hullCopy) >= 6 and stopped < 500:
             print(hullCopy)
             if False:
                 point1 = [hullCopy[hullCounter-4], hullCopy[hullCounter-3]]
@@ -312,14 +315,14 @@ class Polygon:
             iterator = []
             isEar = False
             iterator.clear()
-            counter = hullCounter
-            while counter < len(hullCopy):
+            counter = 0
+            while counter < len(self.hull):
                 iterator.append(counter)
                 counter += 1
             counter = 0
-            while counter < hullCounter:
+            '''while counter < hullCounter:
                 iterator.append(counter)
-                counter += 1
+                counter += 1'''
             #print(iterator)
             #intersection = self.findIntersection(point2, endPoint, point1, point3)
             #dot_circle = self.myCanvas.create_oval(point1[0]-5,point1[1]-5,point1[0]+5,point1[1]+5,outline="black",fill="black",width=0)
@@ -330,10 +333,11 @@ class Polygon:
             i = 0
             while i < (len(iterator)-2):
                # print('i: ' + str(i))
-                point1 = [hullCopy[iterator[i]], hullCopy[iterator[i+1]]]
-                point3 = [hullCopy[iterator[i+2]], hullCopy[iterator[i+3]]]
+                point1 = [self.hull[iterator[i]], self.hull[iterator[i+1]]]
+                point3 = [self.hull[iterator[i+2]], self.hull[iterator[i+3]]]
                 intersection = self.findIntersection(point2, endPoint, point1, point3)
-                if (intersection != [float('inf'), float('inf')]) and not math.isnan(intersection[0]) and not math.isnan(intersection[1]):
+                if ((intersection != [float('inf'), float('inf')]) and not math.isnan(intersection[0]) and not math.isnan(intersection[1])
+                    and point1 != [hullCopy[-2], hullCopy[-1]] and point1 != [hullCopy[0], hullCopy[1]]):
                     #print("intersection testing")
                     #print(intersection)
                     #print(point2)
@@ -358,12 +362,13 @@ class Polygon:
             #dot_circle = self.myCanvas.create_oval(point3[0]-5,point3[1]-5,point3[0]+5,point3[1]+5,outline="yellow",fill="yellow",width=0)
             checkerForTrue = False
             if (totalIntersections%2 == 1):
-                otherCopyHull = hullCopy
+                otherCopyHull = self.hull
                 copyCounter = 0
                 copyIntersections = 0
                 print(point1)
                 print(point2)
                 print(point3)
+                DoesNotWork = False
                 while copyCounter < len(otherCopyHull)-1:
                     copyPoint = [otherCopyHull[copyCounter], otherCopyHull[copyCounter+1]]
                     leftCopyPoint = [otherCopyHull[copyCounter] + 1000, otherCopyHull[copyCounter+1]+1]
@@ -376,19 +381,25 @@ class Polygon:
                         print(newIntersection)
                         if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point1, point2)):
                             copyIntersections += 1
+                            #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                         newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point2, point3)
                         #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                         print(newIntersection)
                         if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point2, point3)):
                             copyIntersections += 1
+                            #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                         newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point1, point3)
-                        #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
+                        
                         print(newIntersection)
                         if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point1, point3)):
+                            #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                             copyIntersections += 1
                         print("\nBreak\n")
+                        if copyIntersections%2 == 1:
+                            DoesNotWork = True
+                            print("Well Thats Bad")
                     copyCounter += 2
-                if copyIntersections%2 == 0:
+                if not DoesNotWork:
                     triangle = self.myCanvas.create_polygon(point1[0], point1[1], point2[0], point2[1], point3[0], point3[1], fill="lemonchiffon")
                     triangle = self.myCanvas.create_line(point1[0], point1[1], point2[0], point2[1], fill="red", width=3)
                     triangle = self.myCanvas.create_line(point3[0], point3[1], point2[0], point2[1], fill="red", width=3)
@@ -399,6 +410,7 @@ class Polygon:
                 else:
                     checkerForTrue = True
             else:
+                print("Didnt' Make it")
                 checkerForTrue = True
             if checkerForTrue:
                 print("notPopping")
@@ -506,7 +518,11 @@ class Polygon:
             print(i)
             
             i += 2'''
-            
+    
+    def removeCollinearPoints(self, point1, point2, point3):
+        if self.leftOf(point1, point2, point3) == 0:
+            self.hull.remove(point2)
+                    
     def createScreen(self):
         self.myCanvas.pack()
         self.myTk.mainloop()
