@@ -432,9 +432,20 @@ class Polygon:
                     copyCounter += 2
                 if not DoesNotWork:
                     triangle = self.myCanvas.create_polygon(point1[0], point1[1], point2[0], point2[1], point3[0], point3[1], fill="lemonchiffon")
-                    triangle = self.myCanvas.create_line(point1[0], point1[1], point2[0], point2[1], fill="red", width=3)
-                    triangle = self.myCanvas.create_line(point3[0], point3[1], point2[0], point2[1], fill="red", width=3)
-                    triangle = self.myCanvas.create_line(point1[0], point1[1], point3[0], point3[1], fill="red", width=3)
+                    '''
+                    SALAMI
+                    
+                    HERE YOU GO PIERS!!!!!!!!!!! TAKE IT HERE : ) I REFUSE TO HELP WITH YOUR VARIABLES 
+                    BECAUSE I DON'T KNOW WHAT THEY DO
+                    
+                    THE TRIANGULE IS GENERATED USING POINT1, POINT2, AND POINT3 RIGHT HERE IN THIS SCOPE
+                    
+                    
+                    
+                    '''
+                    #triangle = self.myCanvas.create_line(point1[0], point1[1], point2[0], point2[1], fill="red", width=3)
+                    #triangle = self.myCanvas.create_line(point3[0], point3[1], point2[0], point2[1], fill="red", width=3)
+                    #triangle = self.myCanvas.create_line(point1[0], point1[1], point3[0], point3[1], fill="red", width=3)
                     self.myCanvas.pack()
                     print("making Triangle" + str(copyIntersections))
                     #time.sleep(1)
