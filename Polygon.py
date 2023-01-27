@@ -483,6 +483,7 @@ class Polygon:
                     copyCounter += 2
                 if not DoesNotWork:
                     triangle = self.myCanvas.create_polygon(point1[0], point1[1], point2[0], point2[1], point3[0], point3[1], fill="lemonchiffon")
+                    pindex = [self.coordmap[point1[0]*self.Canvasy+point1[1]]]
                     '''
                     SALAMI
                     
