@@ -104,6 +104,7 @@ class Polygon:
                 if count == 2:
                     self.myCanvas.create_line(solid_list[0][0],solid_list[0][1], solid_list[1][0], solid_list[1][1], fill="green", width=5)
                     solid_list.clear()         
+                    count = 0
                  
     def __init__(self):
         self.myTk = Tk()
@@ -145,7 +146,7 @@ class Polygon:
         draw_new_button = Button(self.myTk, text = "Clear")
         draw_new_button.pack(side="top")
         draw_new_button["command"] = self.delete_everything
-        change_line_button = Button(self.myTk, text="Change Line Type")
+        change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
         change_line_button.pack(side="bottom")
         change_line_button["command"] = self.change_line_type1
         restart_button = Button(self.myTk, text="Restart")
