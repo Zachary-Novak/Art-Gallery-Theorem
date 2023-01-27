@@ -700,6 +700,7 @@ class Polygon:
                     self.lightList.append(self.myCanvas.create_polygon(self.light[0], self.light[1], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][0], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][1], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][0], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][1], fill = "yellow"))
                 temp = self.myCanvas.create_oval(self.light[0]-5, self.light[1]-5, self.light[0]+5, self.light[1]+5, fill="blue")
             else:
+                print("hi0")
                 nextshine = self.edgeQueue[0]
                 self.edgeQueue.pop(0)
                 linei = []
@@ -717,25 +718,32 @@ class Polygon:
                     commonQ = True
                 for i in linei:
                     p = [self.pointList[self.edgelist[i][0]], self.pointList[self.edgelist[i][1]], self.findIntersection(self.pointList[self.edgelist[i][0]], self.pointList[self.edgelist[i][1]], nextshine[0], nextshine[1]), self.findIntersection(self.pointList[self.edgelist[i][0]], self.pointList[self.edgelist[i][1]], nextshine[0], nextshine[2])]
-                    if not self.isIntersectionTouchingLineSegments(p[3], p[0], p[1], nextshine[0], [2*nextshine[2][0]-nextshine[0][0], 2*nextshine[2][1]-nextshine[0][1]]):
+                    if not self.isIntersectionTouchingLineSegments(p[3], p[0], p[1], nextshine[0], [2*p[3][0]-nextshine[0][0], 2*p[3][1]-nextshine[0][1]]):
                         p.pop(3)
-                    if not self.isIntersectionTouchingLineSegments(p[2], p[0], p[1], nextshine[0], [2*nextshine[1][0]-nextshine[0][0], 2*nextshine[1][1]-nextshine[0][1]]):
+                    if not self.isIntersectionTouchingLineSegments(p[2], p[0], p[1], nextshine[0], [2*p[2][0]-nextshine[0][0], 2*p[2][1]-nextshine[0][1]]):
                         p.pop(2)
                     if len(p)==4:
+                        print("hi4")
                         p.pop(0);p.pop(0)
                     elif len(p) == 2:
-                        #print("y")
+                        print("hi2")
                         if not commonQ:
                             continue
+                        else:
+                            p.pop(0);p.pop(0)
+                            p.append(self.pointList[self.edgelist[i][0]+self.edgelist[i][1]-common])
                     elif len(p)==3:
+                        print("hi3")
                         p.pop(0);p.pop(0)
-                        if commonQ:
-                            p.append(self.pointList[common])
                     q = [nextshine[1], nextshine[2]]
                     if len(p)==1:
-                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[1][0], q[1][1], q[0][0], q[0][1], fill = "yellow", outline = "red"))
-                        p.append(self.pointList[self.edgelist[i][0]+self.edgelist[i][1]-common])
-                    elif self.isIntersectionTouchingLineSegments(self.findIntersection(p[0], q[0], p[1], q[1]), p[0], q[0], p[1], q[1]):
+                        if commonQ:
+                            p.append(self.pointList[common])
+                            self.lightList.append(self.myCanvas.create_polygon(q[1][0], q[1][1], q[0][0], q[0][1], p[1][0], p[1][1], fill = "yellow", outline = "red"))
+                        else:
+                            p.append(self.pointList[self.edgelist[i][0]+self.edgelist[i][1]-common])
+                            self.lightList.append(self.myCanvas.create_polygon(q[1][0], q[1][1], q[0][0], q[0][1], p[0][0], p[0][1], fill = "yellow", outline = "red"))
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(p[0], q[0], p[1], q[1]), p[0], q[0], p[1], q[1]):
                         self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[1][0], q[1][1], q[0][0], q[0][1], p[1][0], p[1][1], fill = "yellow", outline = "red"))
                     else:
                         self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[0][0], q[0][1], q[1][0], q[1][1], p[1][0], p[1][1], fill = "yellow", outline = "red"))
