@@ -12,9 +12,10 @@ class Polygon:
         os.execl(python, python, * sys.argv)
         
     def draw_dots(self, event):
-        if not self.finishedHull and not self.buttonQ:
-            x_coord = event.x
-            y_coord = event.y
+        print(event)
+        x_coord = event.x
+        y_coord = event.y
+        if not self.finishedHull and not self.buttonQ and x_coord > 0 and x_coord < 1200 and y_coord > 0 and y_coord < 800:
             self.pointList.append(x_coord)
             self.pointList.append(y_coord)
             self.hull.append(x_coord)
@@ -65,7 +66,7 @@ class Polygon:
                     self.pointList.pop()
                     self.pointList.pop()
                     self.buttonQ = False
-        elif len(self.light)==0 and not self.buttonQ:
+        elif len(self.light)==0 and not self.buttonQ and self.Triangulated:
             self.light = [event.x, event.y]
             self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="yellow",width=0))
     
@@ -80,6 +81,7 @@ class Polygon:
         self.triList.clear()
         self.edgeQueue.clear()
         self.finishedHull = False
+        self.Triangulated = False
         self.shineQ = False
         self.absorbedQ = False
     
@@ -116,6 +118,7 @@ class Polygon:
         self.pointDraw = []
         self.coordmap = dict()
         self.pointmap = dict()
+        self.Triangulated = False
         self.edgelist = []
         self.edgedraw = []
         self.edgemap = dict()
@@ -143,7 +146,7 @@ class Polygon:
         draw_new_button = Button(self.myTk, text = "Clear")
         draw_new_button.pack(side="top")
         draw_new_button["command"] = self.delete_everything
-        change_line_button = Button(self.myTk, text="Change Line Type")
+        change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
         change_line_button.pack(side="bottom")
         change_line_button["command"] = self.change_line_type1
         restart_button = Button(self.myTk, text="Restart")
@@ -255,7 +258,8 @@ class Polygon:
             
             
         else:
-            print("Failure :(")
+            #print("Failure :(")
+            pass
             
         #print(intersection)
         '''if (intersection[0] + 0.000005 > round(intersection[0])):
@@ -539,8 +543,9 @@ class Polygon:
             stopped += 1
             
         if stopped == 0:
-            print("done?")
-        
+            #print("done?")
+            pass
+        self.Triangulated = True
 
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
@@ -635,14 +640,14 @@ class Polygon:
     def pointresume(self, event):
         if(event.x != self.prevx or event.y != self.prevy):
             self.buttonQ = False
-        print(event.x)
-        print(event.y)
+        #print(event.x)
+        #print(event.y)
     def pointhalt(self, event):
         self.buttonQ = True
         self.prevx = event.x
         self.prevy = event.y
-        print("bye")
-        print(self.prevx, self.prevy)
+        #print("bye")
+        #print(self.prevx, self.prevy)
     def change_line_type(self, event):
         if not self.shineQ:
             self.linetype = 1-self.linetype
@@ -699,7 +704,7 @@ class Polygon:
                     temp = self.pointmap[(int)(self.triList[nextshine[4]][math.ceil(i/2)+1]* (self.triList[nextshine[4]][math.ceil(i/2)+1]-1)/2+ self.triList[nextshine[4]][math.floor(i/2)])]
                     if  temp != nextshine[3]:
                         linei.append(temp)
-                print([self.edgelist[linei[0]], self.edgelist[linei[1]]])
+                #print([self.edgelist[linei[0]], self.edgelist[linei[1]]])
                 if(self.edgelist[linei[0]][0] == self.edgelist[linei[1]][0] or self.edgelist[linei[0]][0]==self.edgelist[linei[1]][1]):
                     common = self.edgelist[linei[0]][0]
                 else:
@@ -716,7 +721,7 @@ class Polygon:
                     if len(p)==4:
                         p.pop(0);p.pop(0)
                     elif len(p) == 2:
-                        print("y")
+                        #print("y")
                         if not commonQ:
                             continue
                     elif len(p)==3:
