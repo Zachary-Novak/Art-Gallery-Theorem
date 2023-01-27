@@ -16,6 +16,7 @@ edgemap = dict() #hash map that takes in the index of an edge and outputs the in
 linetype = 0 #keeps track of the type of the line being added
 triList = [] #list of the 3 indices of the points which make up the triangle
 edgeQueue = [] #list of edges which we need to do math for
+triangleinit = 0 #index of triangle containing the light source
 '''variables for my triangulation plotting'''
 pc = -1 #number of polygonpoints plotted.
 trianglemaker = [] #for adding a triangle in the drawsegment section
@@ -24,6 +25,7 @@ pointsave = []
 edgetypesave = [0,0,0]
 shineQ = False
 absorbedQ = False
+lightList = [] #variable that keeps track of every shape of light drawn
 
 def d2(point1, point2): #distance, but without the square root
     return pow((point2[1]-point1[1]),2)+pow(point2[0]-point1[0],2)
@@ -88,6 +90,7 @@ def draw_segment(event): #used to generate the triangulated polygon, don't use i
                 edgeList.append([pc, pointsave[0], linetype])
                 edgedraw.append(myCanvas.create_line(pointList[edgeList[len(edgeList)-1][0]][0], pointList[edgeList[len(edgeList)-1][0]][1], pointList[edgeList[len(edgeList)-1][1]][0], pointList[edgeList[len(edgeList)-1][1]][1], fill=["black", "magenta"][edgetypesave[0]]))
                 myCanvas.itemconfig(edgedraw[pointmap[pointsave[0]*(pointsave[0]-1)/2+pointsave[2]]], fill="cyan")
+                edgeList[pointmap[pointsave[0]*(pointsave[0]-1)/2+pointsave[2]]][2] = 2
                 edgemap[pc*(pc-1)/2+pointsave[2]] = [len(triList)]
                 edgemap[pc*(pc-1)/2+pointsave[0]] = [len(triList)]
                 edgemap[pointsave[0]*(pointsave[0]-1)/2+pointsave[2]].append(len(triList))
@@ -98,12 +101,35 @@ def draw_segment(event): #used to generate the triangulated polygon, don't use i
         pointtracker = (pointtracker+1)%3
 
 def change_line_type(event):
+    global linetype, absorbedQ
     if not shineQ:
-        global linetype
         linetype = 1-linetype
     elif not absorbedQ:
         if len(edgeQueue)==0:
-            print("hi")
+            for i in range(3):
+                reflect = [light[0], light[1]]
+                if(edgeList[pointmap[triList[triangleinit][math.ceil(i/2)+1]*(triList[triangleinit][math.ceil(i/2)+1]-1)/2+triList[triangleinit][math.floor(i/2)]]][2] > 0):
+                    temp = edgemap[pointmap[triList[triangleinit][math.ceil(i/2)+1]*(triList[triangleinit][math.ceil(i/2)+1]-1)/2+triList[triangleinit][math.floor(i/2)]]]
+                    nexttri = triangleinit
+                    if(edgeList[pointmap[triList[triangleinit][math.ceil(i/2)+1]*(triList[triangleinit][math.ceil(i/2)+1]-1)/2+triList[triangleinit][math.floor(i/2)]]][2] == 2):
+                        print(nexttri)
+                        nexttri = temp[0]+temp[1]-triangleinit
+                    if edgeList[pointmap[triList[triangleinit][math.ceil(i/2)+1]*(triList[triangleinit][math.ceil(i/2)+1]-1)/2+triList[triangleinit][math.floor(i/2)]]][2] == 1:
+                        v1 = [light[0]-pointList[triList[triangleinit][math.ceil(i/2)+1]][0], light[1]-pointList[triList[triangleinit][math.ceil(i/2)+1]][1]]
+                        v2 = [pointList[triList[triangleinit][math.floor(i/2)]][0]-pointList[triList[triangleinit][math.ceil(i/2)+1]][0], pointList[triList[triangleinit][math.floor(i/2)]][1]-pointList[triList[triangleinit][math.ceil(i/2)+1]][1]]
+                        cosnum = v1[0]*v2[0]+v1[1]*v2[1]
+                        sinnum = v1[0]*v2[1]-v1[1]*v2[0]
+                        prodnormsq = (v1[0]*v1[0]+v1[1]*v1[1])*(v2[0]*v2[0]+v2[1]*v2[1])
+                        rx = ((cosnum*cosnum-sinnum*sinnum)*v1[0]-2*cosnum*sinnum*v1[1])/prodnormsq+pointList[triList[triangleinit][math.ceil(i/2)+1]][0]
+                        ry = (2*cosnum*sinnum*v1[0]+(cosnum*cosnum-sinnum*sinnum)*v1[1])/prodnormsq+pointList[triList[triangleinit][math.ceil(i/2)+1]][1]
+                        reflect = [rx, ry]
+                        nexttri = triangleinit
+                    #edgeQueue.append([source, intersect1, intersect2, edgeindex, triangleindex])
+                    edgeQueue.append([[reflect[0], reflect[1]], pointList[triList[triangleinit][math.ceil(i/2)+1]], pointList[triList[triangleinit][math.floor(i/2)]], pointmap[triList[triangleinit][math.ceil(i/2)+1]*(triList[triangleinit][math.ceil(i/2)+1]-1)/2+triList[triangleinit][math.floor(i/2)]], nexttri])
+                    print(edgeQueue)
+                lightList.append(myCanvas.create_polygon(reflect[0], reflect[1], pointList[triList[triangleinit][math.ceil(i/2+1)]][0], pointList[triList[triangleinit][math.ceil(i/2+1)]][1], pointList[triList[triangleinit][math.floor(i/2)]][0], pointList[triList[triangleinit][math.floor(i/2)]][1], fill = "yellow"))
+        if len(edgeQueue)==0:
+            absorbedQ = 1
     '''if linetype == 0:
         myCanvas.create_polygon(pointList[0],pointList[1],pointList[2],pointList[3],pointList[4],pointList[5], fill="yellow", width=0)
         hi = 2
@@ -126,9 +152,12 @@ def change_line_type(event):
         print(rx, ry)
         myCanvas.create_oval(rx-5, ry-5, rx+5, ry+5)
         myCanvas.create_polygon(rx, ry, pointList[0], pointList[1], pointList[2], pointList[3], fill="green")'''
-        
+def initShine(event):
+    global shineQ
+    shineQ = 1 
         
 myCanvas.pack()
 myTk.bind("<Button-1>", draw_segment)
 myTk.bind("<space>", change_line_type)
+myTk.bind("<Return>", initShine)
 myTk.mainloop()
