@@ -12,7 +12,7 @@ class Polygon:
         os.execl(python, python, * sys.argv)
         
     def draw_dots(self, event):
-        if not self.finishedHull and not self.buttonQ:
+        if not self.finishedHull:
             x_coord = event.x
             y_coord = event.y
             self.pointList.append(x_coord)
@@ -65,7 +65,7 @@ class Polygon:
                     self.pointList.pop()
                     self.pointList.pop()
                     self.buttonQ = False
-        elif len(self.light)==0 and not self.buttonQ:
+        elif len(self.light)==0:
             self.light = [event.x, event.y]
             self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="yellow",width=0))
     
