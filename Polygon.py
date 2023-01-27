@@ -99,8 +99,8 @@ class Polygon:
         self.myTk.config(menu = menu_bar)"""
         
         options = [
-            'Normal Polygon',
-            'Polygon with mirrors',
+            'Lines with walls',
+            'Lines with mirrors',
             
         ]
         
