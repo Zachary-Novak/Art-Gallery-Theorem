@@ -12,7 +12,7 @@ class Polygon:
         os.execl(python, python, * sys.argv)
         
     def draw_dots(self, event):
-        if not self.finishedHull:
+        if not self.finishedHull and not self.buttonQ:
             x_coord = event.x
             y_coord = event.y
             self.pointList.append(x_coord)
@@ -30,6 +30,7 @@ class Polygon:
                 #print(len(pointList))
                 #print("FoundEnd)")
                 self.edgedraw.append(self.myCanvas.create_line(self.pointList[0], self.pointList[1], self.hull[0], self.hull[1], fill=["blue", "magenta"][self.linetype]))
+                self.pointmap[(int)((len(self.hull)/2-2)*(len(self.hull)/2-3)/2)] = len(self.edgelist)
                 self.edgelist.append([(int)(len(self.hull)/2-2), 0, self.linetype])
                 self.hull.pop()
                 self.hull.pop()
@@ -37,8 +38,8 @@ class Polygon:
                 for i in range((int)(len(self.hull)/2)):
                     self.pointList.append([self.hull[2*i], self.hull[2*i+1]])
                     self.coordmap[self.hull[2*i]*self.Canvasy+self.hull[2*i+1]] = i
-                print(self.pointList)
-                print(self.edgelist)
+                #print(self.pointList)
+                #print(self.edgelist)
                 self.finishedHull = True
             else:
                 if len(self.pointList) == 2:
@@ -50,6 +51,7 @@ class Polygon:
                     self.pointDraw.append(self.myCanvas.create_oval(x_coord-5,y_coord-5,x_coord+5,y_coord+5,outline="black",fill="green",width=0))
                     #print("We Did IT!")
                     self.edgedraw.append(self.myCanvas.create_line(self.pointList[0], self.pointList[1], self.pointList[2], self.pointList[3], fill=["blue","magenta"][self.linetype]))
+                    self.pointmap[(int)((len(self.hull)/2+1)*(len(self.hull)/2-2)/2)] = len(self.edgelist)
                     self.edgelist.append([(int)(len(self.hull)/2-1), (int)(len(self.hull)/2-2), self.linetype])
                     self.pointList.pop(0)
                     self.pointList.pop(0)
@@ -62,10 +64,15 @@ class Polygon:
                     self.hull.pop()
                     self.pointList.pop()
                     self.pointList.pop()
+                    self.buttonQ = False
+        elif len(self.light)==0 and not self.buttonQ:
+            self.light = [event.x, event.y]
+            self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="yellow",width=0))
     
     def delete_everything(self):
         self.myCanvas.delete("all")
         self.hull.clear()
+        self.light = []
         self.pointList.clear()
         self.pointmap.clear()
         self.edgelist.clear()
@@ -87,11 +94,11 @@ class Polygon:
         count = 0
         solid_list = []
         for i in range(len(self.edgelist)):
-            print(self.edgelist[i][2])
+            #print(self.edgelist[i][2])
             if self.edgelist[i][2] == 0:
                 count += 1
                 solid_list.append(self.edgelist[i])
-                print("here")
+                #print("here")
                 if count == 2:
                     self.myCanvas.create_line(solid_list[0][0],solid_list[0][1], solid_list[1][0], solid_list[1][1], fill="green", width=5)
                     solid_list.clear()         
@@ -122,8 +129,10 @@ class Polygon:
         self.hull = []
         self.destroyList = []
         self.finishedHull = False
+        self.buttonQ = False
+        self.prevx = -100
+        self.prevy = -100
         
-        self.myTk.bind("<Button-1>", self.draw_dots)
 
         quit_button = Button(self.myTk, text='Exit', bg='black', fg='white')
         quit_button.pack(side="bottom")
@@ -136,12 +145,15 @@ class Polygon:
         draw_new_button["command"] = self.delete_everything
         change_line_button = Button(self.myTk, text="Change Line Type")
         change_line_button.pack(side="bottom")
-        change_line_button["command"] = self.change_line_type
+        change_line_button["command"] = self.change_line_type1
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
-        
-        #self.myTk.bind("<space>", self.change_line_type)
+        self.myTk.bind("<space>", self.change_line_type)
+        self.myTk.bind("l", self.light_next)
+        self.myTk.bind("<Button-1>", self.draw_dots)
+        self.myTk.bind("<Leave>", self.pointhalt)
+        self.myTk.bind("<Enter>", self.pointresume)
         
         """menu_bar = Menu(self.myTk)
         drop_down = Menu(menu_bar)
@@ -350,31 +362,36 @@ class Polygon:
         return finalSlope
     
     def isIntersectionTouchingLineSegments(self, intersection, point1, point2, point3, point4):
+        if(math.isinf(intersection[0]) or math.isinf(intersection[1])):
+            return False
         if (round(intersection[0]) != point2[0] and round(intersection[1] != point2[1])):
-            print("First Passed")
+            #print("First Passed")
             if (min([point1[0], point2[0], intersection[0]]) != intersection[0] and max([point1[0], point2[0], intersection[0]]) != intersection[0]) or (intersection[0] == point1[0] and intersection[0] == point2[0]):
-                print("Second Passed")
+                #print("Second Passed")
                 if (min([point1[1], point2[1], intersection[1]]) != intersection[1] and max([point1[1], point2[1], intersection[1]]) != intersection[1]) or (intersection[1] == point1[1] and intersection[1] == point2[1]):
-                    print("Third Passed")
+                    #print("Third Passed")
                     if (min([point3[1], point4[1], intersection[1]]) != intersection[1] and max([point3[1], point4[1], intersection[1]]) != intersection[1]) or (intersection[1] == point3[1] and intersection[1] == point4[1]):
-                        print("Fourth Passed")
+                        #print("Fourth Passed")
                         if (min([point3[0], point4[0], intersection[0]]) != intersection[0] and max([point3[0], point4[0], intersection[0]]) != intersection[0]) or (intersection[0] == point3[0] and intersection[0] == point4[0]):
                             return True
         return False
     
     def triangulate(self):
-        
+        if(len(self.destroyList)==0):
+            self.buttonQ = True
+        if not self.finishedHull:
+            return
         hullCopy = self.hull
         #hullCopy.append(hullCopy[0])
         #hullCopy.append(hullCopy[1])
-        print(hullCopy)
+        #print(hullCopy)
         
         stopped = 0
         
         hullCounter = 0
         '''(len(hullCopy) - 4)'''
         while len(hullCopy) >= 6 and stopped < 500:
-            print(hullCopy)
+            #print(hullCopy)
             if False:
                 point1 = [hullCopy[hullCounter-4], hullCopy[hullCounter-3]]
             else:
@@ -402,7 +419,7 @@ class Polygon:
                 iterator.append(counter)
                 counter += 1
             counter = 0
-            print(iterator)
+            #print(iterator)
             '''while counter < hullCounter:
                 iterator.append(counter)
                 counter += 1'''
@@ -448,73 +465,75 @@ class Polygon:
                 otherCopyHull = self.hull
                 copyCounter = 0
                 copyIntersections = 0
-                print(point1)
-                print(point2)
-                print(point3)
+                #print(point1)
+                #print(point2)
+                #print(point3)
                 DoesNotWork = False
                 while copyCounter < len(otherCopyHull)-1:
                     copyPoint = [otherCopyHull[copyCounter], otherCopyHull[copyCounter+1]]
                     leftCopyPoint = [otherCopyHull[copyCounter] + 1000, otherCopyHull[copyCounter+1]+1]
                     if copyPoint != point1 and copyPoint != point2 and copyPoint != point3:
                         #dot_circle = self.myCanvas.create_line([copyPoint[0], copyPoint[1]], leftCopyPoint[0], leftCopyPoint[1], fill="black")
-                        print(copyPoint)
+                        #print(copyPoint)
                         newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point1, point2)
                         #dot_circle = self.myCanvas.create_oval(copyPoint[0]-5,copyPoint[1]-5,copyPoint[0]+5,copyPoint[1]+5,outline="black",fill="black",width=0)
                         #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
-                        print(newIntersection)
+                        #print(newIntersection)
                         if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point1, point2)):
                             copyIntersections += 1
                             #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                         newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point2, point3)
                         #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
-                        print(newIntersection)
+                        #print(newIntersection)
                         if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point2, point3)):
                             copyIntersections += 1
                             #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                         newIntersection = self.findIntersection(copyPoint, leftCopyPoint, point1, point3)
                         
-                        print(newIntersection)
+                        #print(newIntersection)
                         if (self.isIntersectionTouchingLineSegments(newIntersection, copyPoint, leftCopyPoint, point1, point3)):
                             #dot_circle = self.myCanvas.create_oval(newIntersection[0]-5,newIntersection[1]-5,newIntersection[0]+5,newIntersection[1]+5,outline="red",fill="red",width=0)
                             copyIntersections += 1
-                        print("\nBreak\n")
+                        #print("\nBreak\n")
                         if copyIntersections%2 == 1:
                             DoesNotWork = True
-                            print("Well Thats Bad")
+                            #print("Well Thats Bad")
                     copyCounter += 2
                 if not DoesNotWork:
-                    triangle = self.myCanvas.create_polygon(point1[0], point1[1], point2[0], point2[1], point3[0], point3[1], fill="lemonchiffon")
-                    pindex = [self.coordmap[point1[0]*self.Canvasy+point1[1]]]
-                    '''
-                    SALAMI
-                    
-                    HERE YOU GO PIERS!!!!!!!!!!! TAKE IT HERE : ) I REFUSE TO HELP WITH YOUR VARIABLES 
-                    BECAUSE I DON'T KNOW WHAT THEY DO
-                    
-                    THE TRIANGULE IS GENERATED USING POINT1, POINT2, AND POINT3 RIGHT HERE IN THIS SCOPE
-                    
-                    
-                    
-                    '''
-                    triangle = self.myCanvas.create_line(point1[0], point1[1], point2[0], point2[1], fill="red", width=3)
-                    triangle = self.myCanvas.create_line(point3[0], point3[1], point2[0], point2[1], fill="red", width=3)
-                    triangle = self.myCanvas.create_line(point1[0], point1[1], point3[0], point3[1], fill="red", width=3)
+                    triangle = self.myCanvas.create_polygon(point1[0], point1[1], point2[0], point2[1], point3[0], point3[1], fill="")
+                    pindex = [self.coordmap[point1[0]*self.Canvasy+point1[1]], self.coordmap[point2[0]*self.Canvasy+point2[1]], self.coordmap[point3[0]*self.Canvasy+point3[1]]]
+                    pindex.sort()
+                    #print(self.pointmap.keys())
+                    for i in range(3):
+                        if (int)(pindex[math.ceil(i/2)+1]*(pindex[math.ceil(i/2)+1]-1)/2+pindex[math.floor(i/2)]) not in self.pointmap.keys():
+                            self.pointmap[(int)(pindex[math.ceil(i/2)+1]*(pindex[math.ceil(i/2)+1]-1)/2+pindex[math.floor(i/2)])] = len(self.edgelist)
+                            self.edgelist.append([pindex[math.ceil(i/2)+1], pindex[math.floor(i/2)], 2])
+                            self.edgemap[self.pointmap[(int)(pindex[math.ceil(i/2)+1]*(pindex[math.ceil(i/2)+1]-1)/2+pindex[math.floor(i/2)])]] = [len(self.triList)]
+                            self.edgedraw.append(self.myCanvas.create_line(self.pointList[pindex[math.ceil(i/2)+1]][0],self.pointList[pindex[math.ceil(i/2)+1]][1], self.pointList[pindex[math.floor(i/2)]][0], self.pointList[pindex[math.floor(i/2)]][1], fill = "cyan"))
+                        elif self.pointmap[(int)(pindex[math.ceil(i/2)+1]*(pindex[math.ceil(i/2)+1]-1)/2+pindex[math.floor(i/2)])] not in self.edgemap.keys():
+                            self.edgemap[self.pointmap[(int)(pindex[math.ceil(i/2)+1]*(pindex[math.ceil(i/2)+1]-1)/2+pindex[math.floor(i/2)])]] = [(len(self.triList))]
+                        else:
+                            self.edgemap[self.pointmap[(int)(pindex[math.ceil(i/2)+1]*(pindex[math.ceil(i/2)+1]-1)/2+pindex[math.floor(i/2)])]].append((len(self.triList)))
+                    self.triList.append(pindex)
+                    triangle = self.myCanvas.create_line(point1[0], point1[1], point2[0], point2[1], fill="", width=0)
+                    triangle = self.myCanvas.create_line(point3[0], point3[1], point2[0], point2[1], fill="", width=0)
+                    triangle = self.myCanvas.create_line(point1[0], point1[1], point3[0], point3[1], fill="", width=0)
                     self.myCanvas.pack()
-                    print("making Triangle" + str(copyIntersections))
+                    #print("making Triangle" + str(copyIntersections))
                     #time.sleep(1)
                 else:
                     checkerForTrue = True
             else:
-                print("Didnt' Make it")
+                #print("Didnt' Make it")
                 checkerForTrue = True
             if checkerForTrue:
-                print("notPopping")
+                #print("notPopping")
                 hullCopy.append(hullCopy[0])
                 hullCopy.append(hullCopy[1])
                 hullCopy.pop(0)
                 hullCopy.pop(0)
             else:
-                print("Popping")
+                #print("Popping")
                 hullCopy.pop(0)
                 hullCopy.pop(0)
             stopped += 1
@@ -613,21 +632,51 @@ class Polygon:
             print(i)
             
             i += 2'''
-    
-    def change_line_type(self):
+    def pointresume(self, event):
+        if(event.x != self.prevx or event.y != self.prevy):
+            self.buttonQ = False
+        print(event.x)
+        print(event.y)
+    def pointhalt(self, event):
+        self.buttonQ = True
+        self.prevx = event.x
+        self.prevy = event.y
+        print("bye")
+        print(self.prevx, self.prevy)
+    def change_line_type(self, event):
+        if not self.shineQ:
+            self.linetype = 1-self.linetype
+    def change_line_type1(self):
+        if(len(self.destroyList) == 0):
+            self.buttonQ = True
         if not self.shineQ:
             self.linetype = 1-self.linetype
     
-    def light_next(self):
+    def light_next(self, event):
         if self.finishedHull and len(self.light)==2 and not self.absorbedQ:
             if len(self.edgeQueue)==0:
+                ray = [self.light[0]+self.Canvasx, self.light[1]+self.Canvasy]
+                self.triangleinit = -1
+                for i in range(len(self.triList)):
+                    count = 0
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray):
+                        count += 1
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray):
+                        count += 1
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray):
+                        count += 1
+                    if count == 1:
+                        self.triangleinit = i
+                if self.triangleinit == -1:
+                    self.light = []
+                    self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
+                    return
                 for i in range(3):
                     reflect = [self.light[0], self.light[1]]
-                    if(self.edgelist[self.pointmap[self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)]]][2] > 0):
+                    if self.edgelist[self.pointmap[(int)(self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)])]][2] > 0:
                         temp = self.edgemap[self.pointmap[self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)]]]
                         nexttri = self.triangleinit
                         if(self.edgelist[self.pointmap[self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)]]][2] == 2):
-                            print(nexttri)
                             nexttri = temp[0]+temp[1]-self.triangleinit
                         if self.edgelist[self.pointmap[self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)]]][2] == 1:
                             v1 = [self.light[0]-self.pointList[self.triList[self.triangleinit][math.ceil(i/2)+1]][0], self.light[1]-self.pointList[self.triList[self.triangleinit][math.ceil(i/2)+1]][1]]
@@ -641,10 +690,61 @@ class Polygon:
                             nexttri = self.triangleinit
                         #edgeQueue.append([source, intersect1, intersect2, edgeindex, triangleindex])
                         self.edgeQueue.append([[reflect[0], reflect[1]], self.pointList[self.triList[self.triangleinit][math.ceil(i/2)+1]], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]], self.pointmap[self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)]], nexttri])
-                        print(self.edgeQueue)
-                    self.lightList.append(self.myCanvas.create_polygon(reflect[0], reflect[1], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][0], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][1], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][0], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][1], fill = "yellow"))
-            if len(self.edgeQueue)==0:
-                self.absorbedQ = 1
+                    self.lightList.append(self.myCanvas.create_polygon(self.light[0], self.light[1], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][0], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][1], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][0], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][1], fill = "yellow"))
+            else:
+                nextshine = self.edgeQueue[0]
+                self.edgeQueue.pop(0)
+                linei = []
+                for i in range(3):
+                    temp = self.pointmap[(int)(self.triList[nextshine[4]][math.ceil(i/2)+1]* (self.triList[nextshine[4]][math.ceil(i/2)+1]-1)/2+ self.triList[nextshine[4]][math.floor(i/2)])]
+                    if  temp != nextshine[3]:
+                        linei.append(temp)
+                print([self.edgelist[linei[0]], self.edgelist[linei[1]]])
+                if(self.edgelist[linei[0]][0] == self.edgelist[linei[1]][0] or self.edgelist[linei[0]][0]==self.edgelist[linei[1]][1]):
+                    common = self.edgelist[linei[0]][0]
+                else:
+                    common = self.edgelist[linei[0]][1]
+                commonQ = False
+                if(self.leftOf(nextshine[0], nextshine[1], self.pointList[common]) ^ self.leftOf(nextshine[0], nextshine[2], self.pointList[common])):
+                    commonQ = True
+                for i in linei:
+                    p = [self.pointList[self.edgelist[i][0]], self.pointList[self.edgelist[i][1]], self.findIntersection(self.pointList[self.edgelist[i][0]], self.pointList[self.edgelist[i][1]], nextshine[0], nextshine[1]), self.findIntersection(self.pointList[self.edgelist[i][0]], self.pointList[self.edgelist[i][1]], nextshine[0], nextshine[2])]
+                    if not self.isIntersectionTouchingLineSegments(p[3], p[0], p[1], nextshine[0], [2*nextshine[2][0]-nextshine[0][0], 2*nextshine[2][1]-nextshine[0][1]]):
+                        p.pop(3)
+                    if not self.isIntersectionTouchingLineSegments(p[2], p[0], p[1], nextshine[0], [2*nextshine[1][0]-nextshine[0][0], 2*nextshine[1][1]-nextshine[0][1]]):
+                        p.pop(2)
+                    if len(p)==4:
+                        p.pop(0);p.pop(0)
+                    elif len(p) == 2:
+                        print("y")
+                        if not commonQ:
+                            continue
+                    elif len(p)==3:
+                        p.pop(0);p.pop(0)
+                        if commonQ:
+                            p.append(self.pointList[common])
+                        else:
+                            p.append(self.pointList[self.edgelist[i][0]+self.edgelist[i][1]-common])
+                    q = [nextshine[1], nextshine[2]]
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(p[0], q[0], p[1], q[1]), p[0], q[0], p[1], q[1]):
+                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[1][0], q[1][1], q[0][0], q[0][1], p[1][0], p[1][1], fill = "yellow"))
+                    else:
+                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[0][0], q[0][1], q[1][0], q[1][1], p[1][0], p[1][1], fill = "yellow"))
+                    if self.edgelist[i][2] == 1:
+                        v1 = [nextshine[0][0]-p[0][0], nextshine[0][1]-p[0][1]]
+                        v2 = [p[1][0]-p[0][0], p[1][1]-p[0][1]]
+                        cosnum = v1[0]*v2[0]+v1[1]*v2[1]
+                        sinnum = v1[0]*v2[1]-v1[1]*v2[0]
+                        prodnormsq = (v1[0]*v1[0]+v1[1]*v1[1])*(v2[0]*v2[0]+v2[1]*v2[1])
+                        rx = ((cosnum*cosnum-sinnum*sinnum)*v1[0]-2*cosnum*sinnum*v1[1])/prodnormsq+p[0][0]
+                        ry = (2*cosnum*sinnum*v1[0]+(cosnum*cosnum-sinnum*sinnum)*v1[1])/prodnormsq+p[0][1]
+                        reflect = [rx, ry]
+                        self.edgeQueue.append([reflect, p[0], p[1], i, nextshine[4]])
+                    if self.edgelist[i][2] == 2:
+                        self.edgeQueue.append([nextshine[0], p[0], p[1], i, self.edgemap[i][0]+self.edgemap[i][1]-nextshine[4]])
+            if len(self.edgeQueue)==0 and len(self.triList) > 0:
+                self.absorbedQ = True
+                #print("done")
 
     def removeCollinearPoints(self, point1, point2, point3):
         if self.leftOf(point1, point2, point3) == 0:
