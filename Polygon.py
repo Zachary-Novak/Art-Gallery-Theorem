@@ -12,7 +12,7 @@ class Polygon:
         os.execl(python, python, * sys.argv)
         
     def draw_dots(self, event):
-        if not self.finishedHull:
+        if not self.finishedHull and not self.buttonQ:
             x_coord = event.x
             y_coord = event.y
             self.pointList.append(x_coord)
@@ -64,7 +64,8 @@ class Polygon:
                     self.hull.pop()
                     self.pointList.pop()
                     self.pointList.pop()
-        elif len(self.light)==0:
+                    self.buttonQ = False
+        elif len(self.light)==0 and not self.buttonQ:
             self.light = [event.x, event.y]
             self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="yellow",width=0))
     
@@ -127,8 +128,10 @@ class Polygon:
         self.hull = []
         self.destroyList = []
         self.finishedHull = False
+        self.buttonQ = False
+        self.prevx = -100
+        self.prevy = -100
         
-        self.myTk.bind("<Button-1>", self.draw_dots)
 
         quit_button = Button(self.myTk, text='Exit', bg='black', fg='white')
         quit_button.pack(side="bottom")
@@ -141,12 +144,15 @@ class Polygon:
         draw_new_button["command"] = self.delete_everything
         change_line_button = Button(self.myTk, text="Change Line Type")
         change_line_button.pack(side="bottom")
-        change_line_button["command"] = self.change_line_type
+        change_line_button["command"] = self.change_line_type1
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
         self.myTk.bind("<space>", self.change_line_type)
         self.myTk.bind("l", self.light_next)
+        self.myTk.bind("<Button-1>", self.draw_dots)
+        self.myTk.bind("<Leave>", self.pointhalt)
+        self.myTk.bind("<Enter>", self.pointresume)
         
         """menu_bar = Menu(self.myTk)
         drop_down = Menu(menu_bar)
@@ -370,7 +376,10 @@ class Polygon:
         return False
     
     def triangulate(self):
-        
+        if(len(self.destroyList)==0):
+            self.buttonQ = True
+        if not self.finishedHull:
+            return
         hullCopy = self.hull
         #hullCopy.append(hullCopy[0])
         #hullCopy.append(hullCopy[1])
@@ -622,8 +631,23 @@ class Polygon:
             print(i)
             
             i += 2'''
-    
+    def pointresume(self, event):
+        if(event.x != self.prevx or event.y != self.prevy):
+            self.buttonQ = False
+        print(event.x)
+        print(event.y)
+    def pointhalt(self, event):
+        self.buttonQ = True
+        self.prevx = event.x
+        self.prevy = event.y
+        print("bye")
+        print(self.prevx, self.prevy)
     def change_line_type(self, event):
+        if not self.shineQ:
+            self.linetype = 1-self.linetype
+    def change_line_type1(self):
+        if(len(self.destroyList) == 0):
+            self.buttonQ = True
         if not self.shineQ:
             self.linetype = 1-self.linetype
     
