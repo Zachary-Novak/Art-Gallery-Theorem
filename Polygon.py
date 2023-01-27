@@ -12,7 +12,7 @@ class Polygon:
         os.execl(python, python, * sys.argv)
         
     def draw_dots(self, event):
-        print(event)
+        #print(event)
         x_coord = event.x
         y_coord = event.y
         if not self.finishedHull and not self.buttonQ and x_coord > 0 and x_coord < 1200 and y_coord > 0 and y_coord < 800:
@@ -545,6 +545,8 @@ class Polygon:
             #print("done?")
             pass
         self.Triangulated = True
+        #for i in range(len(self.hull)*len(self.hull)):
+            #self.light_next()
 
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
@@ -657,7 +659,7 @@ class Polygon:
             self.linetype = 1-self.linetype
     
     def light_next(self, event):
-        if self.finishedHull and len(self.light)==2 and not self.absorbedQ:
+        if self.Triangulated and len(self.light)==2 and not self.absorbedQ:
             if len(self.edgeQueue)==0:
                 ray = [self.light[0]+self.Canvasx, self.light[1]+self.Canvasy]
                 self.triangleinit = -1
@@ -695,6 +697,7 @@ class Polygon:
                         #edgeQueue.append([source, intersect1, intersect2, edgeindex, triangleindex])
                         self.edgeQueue.append([[reflect[0], reflect[1]], self.pointList[self.triList[self.triangleinit][math.ceil(i/2)+1]], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]], self.pointmap[self.triList[self.triangleinit][math.ceil(i/2)+1]*(self.triList[self.triangleinit][math.ceil(i/2)+1]-1)/2+self.triList[self.triangleinit][math.floor(i/2)]], nexttri])
                     self.lightList.append(self.myCanvas.create_polygon(self.light[0], self.light[1], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][0], self.pointList[self.triList[self.triangleinit][math.ceil(i/2+1)]][1], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][0], self.pointList[self.triList[self.triangleinit][math.floor(i/2)]][1], fill = "yellow"))
+                temp = self.myCanvas.create_oval(self.light[0]-5, self.light[1]-5, self.light[0]+5, self.light[1]+5, fill="blue")
             else:
                 nextshine = self.edgeQueue[0]
                 self.edgeQueue.pop(0)
@@ -727,13 +730,15 @@ class Polygon:
                         p.pop(0);p.pop(0)
                         if commonQ:
                             p.append(self.pointList[common])
-                        else:
-                            p.append(self.pointList[self.edgelist[i][0]+self.edgelist[i][1]-common])
                     q = [nextshine[1], nextshine[2]]
-                    if self.isIntersectionTouchingLineSegments(self.findIntersection(p[0], q[0], p[1], q[1]), p[0], q[0], p[1], q[1]):
-                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[1][0], q[1][1], q[0][0], q[0][1], p[1][0], p[1][1], fill = "yellow"))
+                    if len(p)==1:
+                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[1][0], q[1][1], q[0][0], q[0][1], fill = "yellow", outline = "red"))
+                        p.append(self.pointList[self.edgelist[i][0]+self.edgelist[i][1]-common])
+                    elif self.isIntersectionTouchingLineSegments(self.findIntersection(p[0], q[0], p[1], q[1]), p[0], q[0], p[1], q[1]):
+                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[1][0], q[1][1], q[0][0], q[0][1], p[1][0], p[1][1], fill = "yellow", outline = "red"))
                     else:
-                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[0][0], q[0][1], q[1][0], q[1][1], p[1][0], p[1][1], fill = "yellow"))
+                        self.lightList.append(self.myCanvas.create_polygon( p[0][0], p[0][1], q[0][0], q[0][1], q[1][0], q[1][1], p[1][0], p[1][1], fill = "yellow", outline = "red"))
+                    print(p,q)
                     if self.edgelist[i][2] == 1:
                         v1 = [nextshine[0][0]-p[0][0], nextshine[0][1]-p[0][1]]
                         v2 = [p[1][0]-p[0][0], p[1][1]-p[0][1]]
@@ -743,9 +748,15 @@ class Polygon:
                         rx = ((cosnum*cosnum-sinnum*sinnum)*v1[0]-2*cosnum*sinnum*v1[1])/prodnormsq+p[0][0]
                         ry = (2*cosnum*sinnum*v1[0]+(cosnum*cosnum-sinnum*sinnum)*v1[1])/prodnormsq+p[0][1]
                         reflect = [rx, ry]
+                        y = self.triList[nextshine[4]]
+                        x = [self.pointList[y[0]], self.pointList[y[1]], self.pointList[y[2]]]
                         self.edgeQueue.append([reflect, p[0], p[1], i, nextshine[4]])
+                        #print(self.edgeQueue[len(self.edgeQueue)-1])
                     if self.edgelist[i][2] == 2:
+                        y = self.triList[self.edgemap[i][0]+self.edgemap[i][1]-nextshine[4]]
+                        x = [self.pointList[y[0]], self.pointList[y[1]], self.pointList[y[2]]]
                         self.edgeQueue.append([nextshine[0], p[0], p[1], i, self.edgemap[i][0]+self.edgemap[i][1]-nextshine[4]])
+                        #print(self.edgeQueue[len(self.edgeQueue)-1])
             if len(self.edgeQueue)==0 and len(self.triList) > 0:
                 self.absorbedQ = True
                 #print("done")
