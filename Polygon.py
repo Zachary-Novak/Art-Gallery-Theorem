@@ -84,8 +84,24 @@ class Polygon:
     
     def click_action(self):
         entered_text = self.entry.get()
-        
-        
+    
+    # 0 - solid
+    # 1 - mirror
+    # 2- interior triangulation
+    
+    def identify_solid(self):
+        count = 0
+        solid_list = []
+        for i in range(len(self.edgelist)):
+            print(self.edgelist[i][2])
+            if self.edgelist[i][2] == 0:
+                count += 1
+                solid_list.append(self.edgelist[i])
+                print("here")
+                if count == 2:
+                    self.myCanvas.create_line(solid_list[0][0],solid_list[0][1], solid_list[1][0], solid_list[1][1], fill="green", width=5)
+                    solid_list.clear()         
+                 
     def __init__(self):
         self.myTk = Tk()
         self.myTk.title("Triangle Testing")
@@ -123,6 +139,9 @@ class Polygon:
         draw_new_button = Button(self.myTk, text = "Clear")
         draw_new_button.pack(side="top")
         draw_new_button["command"] = self.delete_everything
+        change_line_button = Button(self.myTk, text="Change Line Type")
+        change_line_button.pack(side="bottom")
+        change_line_button["command"] = self.change_line_type
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
@@ -136,21 +155,19 @@ class Polygon:
         menu_bar.add_cascade(label = "Options", menu = drop_down)
         self.myTk.config(menu = menu_bar)"""
         
-        options = [
-            'Normal Polygon',
-            'Polygon with mirrors',
+        """options = [
+            'Lines with walls',
+            'Lines with mirrors',
             
         ]
         
         drop_down = StringVar(self.myTk)
         drop_down.set("Options") # this is the default value
         show = OptionMenu(self.myTk, drop_down, *options)
-        show.pack()
-        
-        
-        
-        
-        
+        if drop_down.get() == options[0]:
+            
+        show.pack()"""
+          
     def pythagMyBro(self, point1, point2):
         return math.sqrt(pow(point2[1] - point1[1], 2) + pow(point2[0] - point1[0]))
 
@@ -605,7 +622,7 @@ class Polygon:
             
             i += 2'''
     
-    def change_line_type(self, event):
+    def change_line_type(self):
         if not self.shineQ:
             self.linetype = 1-self.linetype
     
