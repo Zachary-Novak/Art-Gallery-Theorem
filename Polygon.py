@@ -95,6 +95,7 @@ class Polygon:
                 if count == 2:
                     self.myCanvas.create_line(solid_list[0][0],solid_list[0][1], solid_list[1][0], solid_list[1][1], fill="green", width=5)
                     solid_list.clear()         
+                    count = 0
                  
     def __init__(self):
         self.myTk = Tk()
