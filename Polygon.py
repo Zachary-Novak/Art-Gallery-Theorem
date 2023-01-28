@@ -108,7 +108,13 @@ class Polygon:
                     self.myCanvas.create_line(solid_list[0][0],solid_list[0][1], solid_list[1][0], solid_list[1][1], fill="green", width=5)
                     solid_list.clear()         
                     count = 0
-                 
+    
+    def display_text_button(self):
+        if self.Triangulated:
+            return "Illuminate"
+        else:
+            return "Triangulate"
+                       
     def __init__(self):
         self.myTk = Tk()
         self.myTk.title("Triangle Testing")
@@ -146,15 +152,18 @@ class Polygon:
         quit_button = Button(self.myTk, text='Exit', bg='black', fg='white')
         quit_button.pack(side="bottom")
         quit_button["command"] = self.myTk.destroy
-        triangulate_button = Button(self.myTk, text="Illuminate", highlightcolor="black")
+        """triangulate_button = Button(self.myTk, text= self.display_text_button, highlightcolor="black")
         triangulate_button.pack(side="top")
-        triangulate_button["command"] = self.triangulate
+        triangulate_button["command"] = self.triangulate"""
+        triangulate_info = Label(self.myTk, text = "Press T for Triangulation")
         draw_new_button = Button(self.myTk, text = "Clear")
         draw_new_button.pack(side="top")
         draw_new_button["command"] = self.delete_everything
-        change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
+        """change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
         change_line_button.pack(side="bottom")
-        change_line_button["command"] = self.change_line_type1
+        change_line_button["command"] = self.change_line_type1"""
+        change_line_info = Label(self.myTk, text = "Press Space Bar to change the line type [Pink - Mirror lines, Blue - Walls]")
+        
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
