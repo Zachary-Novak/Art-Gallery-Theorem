@@ -155,14 +155,16 @@ class Polygon:
         """triangulate_button = Button(self.myTk, text= self.display_text_button, highlightcolor="black")
         triangulate_button.pack(side="top")
         triangulate_button["command"] = self.triangulate"""
-        triangulate_info = Label(self.myTk, text = "Press T for Triangulation")
-        draw_new_button = Button(self.myTk, text = "Clear")
-        draw_new_button.pack(side="top")
-        draw_new_button["command"] = self.delete_everything
+        triangulate_info = Label(self.myTk, text = "Press T for Triangulation and L to illuminate")
+        triangulate_info.pack(side="top")
         """change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
         change_line_button.pack(side="bottom")
         change_line_button["command"] = self.change_line_type1"""
         change_line_info = Label(self.myTk, text = "Press Space Bar to change the line type [Pink - Mirror lines, Blue - Walls]")
+        change_line_info.pack(side="top")
+        draw_new_button = Button(self.myTk, text = "Clear")
+        draw_new_button.pack(side="top")
+        draw_new_button["command"] = self.delete_everything
         
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
@@ -172,6 +174,8 @@ class Polygon:
         self.myTk.bind("<Leave>", self.pointhalt)
         self.myTk.bind("<Enter>", self.pointresume)
         self.myTk.bind("l", self.callLight)
+        self.myTk.bind("t", self.triangulate)
+        
         
         """menu_bar = Menu(self.myTk)
         drop_down = Menu(menu_bar)
@@ -395,7 +399,7 @@ class Polygon:
                             return True
         return False
     
-    def callLight1(self):
+    def callLight1(self, event):
         if self.Triangulated:
             while self.lightindex < len(self.sourcelist):
                 self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
@@ -422,7 +426,7 @@ class Polygon:
                 for i in self.sourcelist:
                     self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
     
-    def triangulate(self):
+    def triangulate(self, event):
         if(len(self.destroyList)==0):
             self.buttonQ = True
         if not self.finishedHull:
