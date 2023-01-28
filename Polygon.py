@@ -394,6 +394,18 @@ class Polygon:
         #hullCopy.append(hullCopy[0])
         #hullCopy.append(hullCopy[1])
         #print(hullCopy)
+        if self.Triangulated:
+            while self.lightindex < len(self.sourcelist):
+                self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
+                self.sourcelist.pop()
+                self.absorbedQ = False
+                self.light = self.sourcelist[self.lightindex-1]
+                self.lightindex += 1
+                self.edgeQueue.clear()
+                for i in range(20*len(self.triList)*len(self.triList)):
+                    self.light_next()
+                for i in self.sourcelist:
+                    self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
         
         stopped = 0
         
@@ -552,16 +564,7 @@ class Polygon:
             #print("done?")
             pass
         self.Triangulated = True
-        while self.lightindex < len(self.sourcelist):
-            self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
-            self.sourcelist.pop()
-            self.absorbedQ = False
-            self.light = self.sourcelist[self.lightindex-1]
-            self.lightindex += 1
-            self.edgeQueue.clear()
-            for i in range(20*len(self.triList)*len(self.triList)):
-                self.light_next()
-            self.lightList.append(self.myCanvas.create_oval(self.light[0]-5, self.light[1]-5, self.light[0]+5, self.light[1]+5, fill = "white"))
+        
 
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
