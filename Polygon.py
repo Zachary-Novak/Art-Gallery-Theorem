@@ -27,7 +27,7 @@ class Polygon:
                     self.myCanvas.delete(self.destroyList[counter])
                     counter -= 1
                 self.destroyList.clear()
-            if len(self.hull) > 4 and (math.sqrt(pow((y_coord-self.hull[1]), 2) + pow((x_coord-self.hull[0]), 2))) < 5 and not self.checkForCross():
+            if len(self.hull) > 4 and (math.sqrt(pow((y_coord-self.hull[1]), 2) + pow((x_coord-self.hull[0]), 2))) < 10 and not self.checkForCross():
                 #print(len(pointList))
                 #print("FoundEnd)")
                 self.edgedraw.append(self.myCanvas.create_line(self.pointList[0], self.pointList[1], self.hull[0], self.hull[1], fill=["blue", "magenta"][self.linetype]))
@@ -547,7 +547,7 @@ class Polygon:
             #print("done?")
             pass
         self.Triangulated = True
-        for i in range(20*len(self.triList)*len(self.triList)):
+        for i in range(20*len(self.triList)*len(self.triList)*len(self.triList)):
             self.light_next()
         self.lightList.append(self.myCanvas.create_oval(self.light[0]-5, self.light[1]-5, self.light[0]+5, self.light[1]+5, fill = "white"))
 
