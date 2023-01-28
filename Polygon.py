@@ -699,20 +699,10 @@ class Polygon:
     def light_next(self):
         if self.Triangulated and len(self.light)==2 and not self.absorbedQ:
             if len(self.edgeQueue)==0:
-                ray = [self.light[0], self.light[1]+self.Canvasy]
                 self.triangleinit = -1
                 for i in range(len(self.triList)):
+                    ray = [self.light[0], self.light[1]+self.Canvasy]
                     count = 0
-                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray):
-                        count += 1
-                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray):
-                        count += 1
-                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray):
-                        count += 1
-                    if count == 0:
-                        continue
-                    count = 0
-                    ray[1] -= 2*self.Canvasy
                     if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray):
                         count += 1
                     if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray):
@@ -720,8 +710,20 @@ class Polygon:
                     if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray):
                         count += 1
                     if count != 0:
-                        self.triangleinit = i
-                        print(i)
+                        print(count)
+                        count = 0
+                        ray[1] -= 2*self.Canvasy
+                        self.light[1] += 1
+                        if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray):
+                            count += 1
+                        if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray):
+                            count += 1
+                        if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray):
+                            count += 1
+                        print(count)
+                        print("_")
+                        if count > 0:
+                            self.triangleinit = i
                 if self.triangleinit == -1:
                     self.light = []
                     self.sourcelist.pop(self.lightindex)
