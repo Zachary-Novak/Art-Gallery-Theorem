@@ -68,7 +68,7 @@ class Polygon:
                     self.buttonQ = False
         else:
             self.light = [event.x, event.y]
-            self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="black",width=0))
+            self.sourceDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="black",width=0))
             self.sourcelist.append(self.light)
     
     def delete_everything(self):
@@ -119,6 +119,7 @@ class Polygon:
         self.light = []
         self.lightindex = 0
         self.sourcelist = []
+        self.sourceDraw = []
         self.pointList = []
         self.pointDraw = []
         self.coordmap = dict()
@@ -396,8 +397,6 @@ class Polygon:
         #print(hullCopy)
         if self.Triangulated:
             while self.lightindex < len(self.sourcelist):
-                self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
-                self.sourcelist.pop()
                 self.absorbedQ = False
                 self.light = self.sourcelist[self.lightindex-1]
                 self.lightindex += 1
@@ -693,7 +692,7 @@ class Polygon:
                         self.triangleinit = i
                 if self.triangleinit == -1:
                     self.light = []
-                    self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
+                    self.myCanvas.delete(self.pointDraw[self.lightindex])
                     return
                 for i in range(3):
                     reflect = [self.light[0], self.light[1]]
