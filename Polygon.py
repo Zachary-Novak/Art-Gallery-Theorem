@@ -66,14 +66,17 @@ class Polygon:
                     self.pointList.pop()
                     self.pointList.pop()
                     self.buttonQ = False
-        elif len(self.light)==0 and not self.buttonQ:
+        else:
             self.light = [event.x, event.y]
-            self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="yellow",width=0))
+            self.pointDraw.append(self.myCanvas.create_oval(event.x-5,event.y-5,event.x+5,event.y+5,outline="yellow",fill="black",width=0))
+            self.sourcelist.append(self.light)
     
     def delete_everything(self):
         self.myCanvas.delete("all")
         self.hull.clear()
         self.light = []
+        self.lightindex = 0
+        self.sourcelist.clear()
         self.pointList.clear()
         self.pointmap.clear()
         self.edgelist.clear()
@@ -114,6 +117,8 @@ class Polygon:
         self.Canvasy = 1200
         self.myCanvas = Canvas(self.myTk, bd=4, bg="skyblue", cursor="circle", height=self.Canvasx, width=self.Canvasy)
         self.light = []
+        self.lightindex = 0
+        self.sourcelist = []
         self.pointList = []
         self.pointDraw = []
         self.coordmap = dict()
@@ -547,9 +552,16 @@ class Polygon:
             #print("done?")
             pass
         self.Triangulated = True
-        for i in range(20*len(self.triList)*len(self.triList)):
-            self.light_next()
-        self.lightList.append(self.myCanvas.create_oval(self.light[0]-5, self.light[1]-5, self.light[0]+5, self.light[1]+5, fill = "white"))
+        while self.lightindex < len(self.sourcelist):
+            self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
+            self.sourcelist.pop()
+            self.absorbedQ = False
+            self.light = self.sourcelist[self.lightindex-1]
+            self.lightindex += 1
+            self.edgeQueue.clear()
+            for i in range(20*len(self.triList)*len(self.triList)):
+                self.light_next()
+            self.lightList.append(self.myCanvas.create_oval(self.light[0]-5, self.light[1]-5, self.light[0]+5, self.light[1]+5, fill = "white"))
 
         
         #x = math.sqrt(pow(100, 2)/(pow(castingSlope, 2) + 1)) + point2[0]
