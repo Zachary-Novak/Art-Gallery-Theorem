@@ -1,11 +1,19 @@
 from tkinter import *
 
 
+
 myTk = Tk()
 myTk.geometry("300x400")
 
-myCanvas = Canvas(myTk, bd=4, bg="blue", cursor="circle", height=300, width=300)
-anything = myCanvas.create_polygon(3,3, 80, 90, 0, 300)
+myCanvas = Canvas(myTk, bd=4, bg="ivory", cursor="circle", height=300, width=300)
+
+def createTriangle(theCanvas, pointList):
+    anything = theCanvas.create_polygon(pointList[0], pointList[1], pointList[2], pointList[3], pointList[4], pointList[5], fill="red")
+    return anything
+
+
+temp = createTriangle(myCanvas, [3,3, 80, 90, 0, 300])
+
 myCanvas.pack()
 myCanvas.mainloop()
 
