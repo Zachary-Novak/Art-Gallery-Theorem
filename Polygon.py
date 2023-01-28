@@ -404,15 +404,15 @@ class Polygon:
         if self.Triangulated:
             while self.lightindex < len(self.sourcelist):
                 self.absorbedQ = False
-                self.light = self.sourcelist[self.lightindex-1]
-                self.lightindex += 1
+                self.light = self.sourcelist[self.lightindex]
                 self.edgeQueue.clear()
                 for i in range(20*len(self.triList)*len(self.triList)):
                     self.light_next()
                     if(len(self.light) == 0 or self.absorbedQ):
                         break
+                self.lightindex += 1
             for i in self.sourcelist:
-                self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
+                self.sourceDraw.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
     
     def triangulate(self, event):
         if(len(self.destroyList)==0):
@@ -698,7 +698,7 @@ class Polygon:
     def light_next(self):
         if self.Triangulated and len(self.light)==2 and not self.absorbedQ:
             if len(self.edgeQueue)==0:
-                ray = [self.light[0]+self.Canvasx, self.light[1]+self.Canvasy]
+                ray = [self.light[0]+1, self.light[1]+self.Canvasy]
                 self.triangleinit = -1
                 for i in range(len(self.triList)):
                     count = 0
@@ -710,9 +710,10 @@ class Polygon:
                         count += 1
                     if count == 1:
                         self.triangleinit = i
+                        print(i)
                 if self.triangleinit == -1:
                     self.light = []
-                    self.lightList.pop(self.lightindex)
+                    self.sourcelist.pop(self.lightindex)
                     self.myCanvas.delete(self.sourceDraw[self.lightindex])
                     self.lightindex -= 1
                     return
@@ -824,7 +825,7 @@ class Polygon:
                                 n = test+1
                             test = (int)((n+x)/2)
                         self.edgeQueue.insert(test, [nextshine[0], p[0], p[1], i, self.edgemap[i][0]+self.edgemap[i][1]-nextshine[4], num])
-            if len(self.edgeQueue)==0 and len(self.triList) > 0:
+            if len(self.edgeQueue)==0 and self.Triangulated > 0:
                 self.absorbedQ = True
                 print("done")
 
