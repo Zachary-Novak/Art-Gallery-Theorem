@@ -15,18 +15,18 @@ class Polygon:
         #print(event)
         x_coord = event.x
         y_coord = event.y
+        if len(self.destroyList) > 0:
+            counter = len(self.destroyList)-1
+            while counter >= 0:
+                self.myCanvas.delete(self.destroyList[counter])
+                counter -= 1
+            self.destroyList.clear()
         if not self.finishedHull and not self.buttonQ and x_coord > 0 and x_coord < 1200 and y_coord > 0 and y_coord < 800:
             self.pointList.append(x_coord)
             self.pointList.append(y_coord)
             self.hull.append(x_coord)
             self.hull.append(y_coord)
             #print(len(pointList))
-            if len(self.destroyList) > 0:
-                counter = len(self.destroyList)-1
-                while counter >= 0:
-                    self.myCanvas.delete(self.destroyList[counter])
-                    counter -= 1
-                self.destroyList.clear()
             if len(self.hull) > 4 and (math.sqrt(pow((y_coord-self.hull[1]), 2) + pow((x_coord-self.hull[0]), 2))) < 10 and not self.checkForCross():
                 #print(len(pointList))
                 #print("FoundEnd)")
@@ -162,6 +162,7 @@ class Polygon:
         self.myTk.bind("<Button-1>", self.draw_dots)
         self.myTk.bind("<Leave>", self.pointhalt)
         self.myTk.bind("<Enter>", self.pointresume)
+        self.myTk.bind("l", self.callLight)
         
         """menu_bar = Menu(self.myTk)
         drop_down = Menu(menu_bar)
@@ -385,15 +386,7 @@ class Polygon:
                             return True
         return False
     
-    def triangulate(self):
-        if(len(self.destroyList)==0):
-            self.buttonQ = True
-        if not self.finishedHull:
-            return
-        hullCopy = self.hull
-        #hullCopy.append(hullCopy[0])
-        #hullCopy.append(hullCopy[1])
-        #print(hullCopy)
+    def callLight1(self):
         if self.Triangulated:
             while self.lightindex < len(self.sourcelist):
                 self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
@@ -406,6 +399,31 @@ class Polygon:
                     self.light_next()
                 for i in self.sourcelist:
                     self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
+    def callLight(self, event):
+        if self.Triangulated:
+            while self.lightindex < len(self.sourcelist):
+                self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
+                self.sourcelist.pop()
+                self.absorbedQ = False
+                self.light = self.sourcelist[self.lightindex-1]
+                self.lightindex += 1
+                self.edgeQueue.clear()
+                for i in range(20*len(self.triList)*len(self.triList)):
+                    self.light_next()
+                for i in self.sourcelist:
+                    self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
+    
+    def triangulate(self):
+        if(len(self.destroyList)==0):
+            self.buttonQ = True
+        if not self.finishedHull:
+            return
+        hullCopy = self.hull
+        #hullCopy.append(hullCopy[0])
+        #hullCopy.append(hullCopy[1])
+        #print(hullCopy)
+        
+        #self.callLight1()
         
         stopped = 0
         
