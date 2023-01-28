@@ -400,30 +400,19 @@ class Polygon:
                             return True
         return False
     
-    def callLight1(self, event):
-        if self.Triangulated:
-            while self.lightindex < len(self.sourcelist):
-                self.absorbedQ = False
-                self.light = self.sourcelist[self.lightindex-1]
-                self.lightindex += 1
-                self.edgeQueue.clear()
-                for i in range(20*len(self.triList)*len(self.triList)):
-                    self.light_next()
-                for i in self.sourcelist:
-                    self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
     def callLight(self, event):
         if self.Triangulated:
             while self.lightindex < len(self.sourcelist):
-                self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
-                self.sourcelist.pop()
                 self.absorbedQ = False
                 self.light = self.sourcelist[self.lightindex-1]
                 self.lightindex += 1
                 self.edgeQueue.clear()
                 for i in range(20*len(self.triList)*len(self.triList)):
                     self.light_next()
-                for i in self.sourcelist:
-                    self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
+                    if(len(self.light) == 0 or self.absorbedQ):
+                        break
+            for i in self.sourcelist:
+                self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
     
     def triangulate(self, event):
         if(len(self.destroyList)==0):
@@ -723,7 +712,9 @@ class Polygon:
                         self.triangleinit = i
                 if self.triangleinit == -1:
                     self.light = []
-                    self.myCanvas.delete(self.pointDraw[self.lightindex])
+                    self.lightList.pop(self.lightindex)
+                    self.myCanvas.delete(self.sourceDraw[self.lightindex])
+                    self.lightindex -= 1
                     return
                 for i in range(3):
                     reflect = [self.light[0], self.light[1]]
