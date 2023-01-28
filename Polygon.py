@@ -411,6 +411,7 @@ class Polygon:
                     if(len(self.light) == 0 or self.absorbedQ):
                         break
                 self.lightindex += 1
+            self.myCanvas.delete(*self.sourceDraw)
             for i in self.sourcelist:
                 self.sourceDraw.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
     
@@ -698,7 +699,7 @@ class Polygon:
     def light_next(self):
         if self.Triangulated and len(self.light)==2 and not self.absorbedQ:
             if len(self.edgeQueue)==0:
-                ray = [self.light[0]+1, self.light[1]+self.Canvasy]
+                ray = [self.light[0], self.light[1]+self.Canvasy]
                 self.triangleinit = -1
                 for i in range(len(self.triList)):
                     count = 0
@@ -708,7 +709,17 @@ class Polygon:
                         count += 1
                     if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray):
                         count += 1
-                    if count == 1:
+                    if count == 0:
+                        continue
+                    count = 0
+                    ray[1] -= 2*self.Canvasy
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][1]], self.light, ray):
+                        count += 1
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][0]], self.pointList[self.triList[i][2]], self.light, ray):
+                        count += 1
+                    if self.isIntersectionTouchingLineSegments(self.findIntersection(self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray), self.pointList[self.triList[i][1]], self.pointList[self.triList[i][2]], self.light, ray):
+                        count += 1
+                    if count != 0:
                         self.triangleinit = i
                         print(i)
                 if self.triangleinit == -1:
@@ -791,7 +802,7 @@ class Polygon:
                         sinnum = v1[0]*v2[1]-v1[1]*v2[0]
                         prodnormsq = (v1[0]*v1[0]+v1[1]*v1[1])*(v2[0]*v2[0]+v2[1]*v2[1])
                         if prodnormsq == 0:
-                            return
+                            return None
                         rx = ((cosnum*cosnum-sinnum*sinnum)*v1[0]-2*cosnum*sinnum*v1[1])/prodnormsq+p[0][0]
                         ry = (2*cosnum*sinnum*v1[0]+(cosnum*cosnum-sinnum*sinnum)*v1[1])/prodnormsq+p[0][1]
                         reflect = [rx, ry]
@@ -799,7 +810,7 @@ class Polygon:
                         x = len(self.edgeQueue)
                         d = self.pythagMyBro(p[0], p[1])
                         if(d == 0):
-                            return
+                            return None
                         num = self.tricount[nextshine[4]]/d
                         test = (int)(x/2)
                         while n < x:
@@ -814,7 +825,7 @@ class Polygon:
                         x = len(self.edgeQueue)
                         d = self.pythagMyBro(p[0], p[1])
                         if(d == 0):
-                            return
+                            return None
                         num = self.tricount[self.edgemap[i][0]+self.edgemap[i][1]-nextshine[4]]/d
                         self.tricount[self.edgemap[i][0]+self.edgemap[i][1]-nextshine[4]] += 1
                         test = (int)(x/2)
