@@ -15,18 +15,18 @@ class Polygon:
         #print(event)
         x_coord = event.x
         y_coord = event.y
+        if len(self.destroyList) > 0:
+            counter = len(self.destroyList)-1
+            while counter >= 0:
+                self.myCanvas.delete(self.destroyList[counter])
+                counter -= 1
+            self.destroyList.clear()
         if not self.finishedHull and not self.buttonQ and x_coord > 0 and x_coord < 1200 and y_coord > 0 and y_coord < 800:
             self.pointList.append(x_coord)
             self.pointList.append(y_coord)
             self.hull.append(x_coord)
             self.hull.append(y_coord)
             #print(len(pointList))
-            if len(self.destroyList) > 0:
-                counter = len(self.destroyList)-1
-                while counter >= 0:
-                    self.myCanvas.delete(self.destroyList[counter])
-                    counter -= 1
-                self.destroyList.clear()
             if len(self.hull) > 4 and (math.sqrt(pow((y_coord-self.hull[1]), 2) + pow((x_coord-self.hull[0]), 2))) < 10 and not self.checkForCross():
                 #print(len(pointList))
                 #print("FoundEnd)")
@@ -108,7 +108,13 @@ class Polygon:
                     self.myCanvas.create_line(solid_list[0][0],solid_list[0][1], solid_list[1][0], solid_list[1][1], fill="green", width=5)
                     solid_list.clear()         
                     count = 0
-                 
+    
+    def display_text_button(self):
+        if self.Triangulated:
+            return "Illuminate"
+        else:
+            return "Triangulate"
+                       
     def __init__(self):
         self.myTk = Tk()
         self.myTk.title("Triangle Testing")
@@ -147,15 +153,20 @@ class Polygon:
         quit_button = Button(self.myTk, text='Exit', bg='black', fg='white')
         quit_button.pack(side="bottom")
         quit_button["command"] = self.myTk.destroy
-        triangulate_button = Button(self.myTk, text="Illuminate", highlightcolor="black")
+        """triangulate_button = Button(self.myTk, text= self.display_text_button, highlightcolor="black")
         triangulate_button.pack(side="top")
-        triangulate_button["command"] = self.triangulate
+        triangulate_button["command"] = self.triangulate"""
+        triangulate_info = Label(self.myTk, text = "Press T for Triangulation and L to illuminate")
+        triangulate_info.pack(side="top")
+        """change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
+        change_line_button.pack(side="bottom")
+        change_line_button["command"] = self.change_line_type1"""
+        change_line_info = Label(self.myTk, text = "Press Space Bar to change the line type [Pink - Mirror lines, Blue - Walls]")
+        change_line_info.pack(side="top")
         draw_new_button = Button(self.myTk, text = "Clear")
         draw_new_button.pack(side="top")
         draw_new_button["command"] = self.delete_everything
-        change_line_button = Button(self.myTk, text="Change Line Type [Pink - Mirror lines, Blue - Walls]")
-        change_line_button.pack(side="bottom")
-        change_line_button["command"] = self.change_line_type1
+        
         restart_button = Button(self.myTk, text="Restart")
         restart_button.pack(side="bottom")
         restart_button["command"] = self.restart_program
@@ -163,6 +174,9 @@ class Polygon:
         self.myTk.bind("<Button-1>", self.draw_dots)
         self.myTk.bind("<Leave>", self.pointhalt)
         self.myTk.bind("<Enter>", self.pointresume)
+        self.myTk.bind("l", self.callLight)
+        self.myTk.bind("t", self.triangulate)
+        
         
         """menu_bar = Menu(self.myTk)
         drop_down = Menu(menu_bar)
@@ -386,15 +400,7 @@ class Polygon:
                             return True
         return False
     
-    def triangulate(self):
-        if(len(self.destroyList)==0):
-            self.buttonQ = True
-        if not self.finishedHull:
-            return
-        hullCopy = self.hull
-        #hullCopy.append(hullCopy[0])
-        #hullCopy.append(hullCopy[1])
-        #print(hullCopy)
+    def callLight1(self, event):
         if self.Triangulated:
             while self.lightindex < len(self.sourcelist):
                 self.absorbedQ = False
@@ -405,6 +411,31 @@ class Polygon:
                     self.light_next()
                 for i in self.sourcelist:
                     self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
+    def callLight(self, event):
+        if self.Triangulated:
+            while self.lightindex < len(self.sourcelist):
+                self.myCanvas.delete(self.pointDraw[len(self.pointDraw)-1])
+                self.sourcelist.pop()
+                self.absorbedQ = False
+                self.light = self.sourcelist[self.lightindex-1]
+                self.lightindex += 1
+                self.edgeQueue.clear()
+                for i in range(20*len(self.triList)*len(self.triList)):
+                    self.light_next()
+                for i in self.sourcelist:
+                    self.lightList.append(self.myCanvas.create_oval(i[0]-5, i[1]-5, i[0]+5, i[1]+5, fill = "white"))
+    
+    def triangulate(self, event):
+        if(len(self.destroyList)==0):
+            self.buttonQ = True
+        if not self.finishedHull:
+            return
+        hullCopy = self.hull
+        #hullCopy.append(hullCopy[0])
+        #hullCopy.append(hullCopy[1])
+        #print(hullCopy)
+        
+        #self.callLight1()
         
         stopped = 0
         
